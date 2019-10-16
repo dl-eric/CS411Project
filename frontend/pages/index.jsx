@@ -7,6 +7,9 @@ import { Example, Head, LoadWrapper } from "../components";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { setExample } from "../redux/actions";
+
+import { helloWorld } from "../utils/ApiWrapper";
+
 import "../static/style.scss";
 
 /**
@@ -38,8 +41,17 @@ export default connect(
       super(props);
       this.state = {
         newExample: this.props.example,
-        message: null
+        message: null,
+        hello: null
       };
+    }
+
+    async componentDidMount() {
+      const hello = await helloWorld();
+      console.log("hello: ", hello);
+      if (hello) {
+        this.setState({ hello: hello });
+      }
     }
 
     /**
@@ -79,26 +91,7 @@ export default connect(
       return (
         <div className="App">
           <Head />
-          <Example />
-          <h2>
-            <label>
-              Enter new example text below:
-              <br />
-              <input
-                type="text"
-                value={this.state.newExample}
-                onChange={this.updateExample}
-              ></input>
-            </label>
-          </h2>
-          <button onClick={this.handleSubmit}>Submit</button>
-          <br />
-          <h2>Below is an example LoadWrapper-wrapped message: </h2>
-          <LoadWrapper
-            loadFunction={this.loadMessage}
-            loadState="Wait 2 seconds"
-            resolvedState={this.state.message}
-          />
+          {this.state.hello}
         </div>
       );
     }
