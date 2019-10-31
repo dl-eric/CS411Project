@@ -56,7 +56,7 @@ class FriendPage extends Component {
     }
     render() {
         return (
-            <Container>
+            <div className='app'>
                 <h1 align='center'>Your Friends</h1>
                 <Modal isOpen={this.state.modalOpen}>
                     <ModalBody>
@@ -97,7 +97,7 @@ class FriendPage extends Component {
                     </Col>
                 ))}
                 </Row>
-            </Container>
+            </div>
         )
     }
 }
