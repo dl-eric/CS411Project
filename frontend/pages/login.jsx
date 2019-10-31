@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Head } from "../components";
 import { Button, Form, FormGroup, Input } from "reactstrap";
 
-import Router from "next/router";
+//import Router from "next/router";
 
 import { login, signUp } from "../utils/ApiWrapper";
 
@@ -17,8 +17,7 @@ export default class App extends Component {
     this.state = {
       username: "",
       password: "",
-      failedLogin: false,
-      faileSignUp: false
+      errorMessage: ""
     };
   }
 
@@ -27,27 +26,56 @@ export default class App extends Component {
   updatePassword = event => this.setState({ password: event.target.value });
 
   handleLogin = async () => {
-    this.setState({ faileSignUp: false });
-    const loginSuccess = await login(this.state.username, this.state.password);
-    if (loginSuccess !== null) {
-      this.setState({ username: "", password: "", failedLogin: false });
-      Router.push(`/friendPage/${loginSuccess.id}`);
+    this.setState({ errorMessage: "" });
+    const loginResponse = await login(this.state.username, this.state.password);
+    if (loginResponse.status === 200) {
+      //Router.push(`/friendPage/${loginResponse.id}`);
+      console.log("successful log in");
     } else {
-      this.setState({ failedLogin: true });
+      console.log(loginResponse);
+      let errorMessage = "";
+      switch (loginResponse.status) {
+        case 400:
+          errorMessage = "Invalid log in request";
+          break;
+        case 401:
+          errorMessage = "Incorrect password";
+          break;
+        case 404:
+          errorMessage = "User not found";
+          break;
+        case 500:
+          errorMessage = "Internal server error";
+          break;
+      }
+      this.setState({ errorMessage });
     }
   };
 
   handlesignUp = async () => {
-    this.setState({ failedLogin: false });
-    const signUpSuccess = await signUp(
+    this.setState({ errorMessage: "" });
+
+    const signUpResponse = await signUp(
       this.state.username,
       this.state.password
     );
-    if (signUpSuccess !== null) {
-      this.setState({ username: "", password: "", faileSignUp: false });
-      Router.push(`/friendPage/${signUpSuccess.id}`);
+    if (signUpResponse.status === 200) {
+      console.log("successful sign up");
+      //Router.push(`/friendPage/${signUpSuccess.id}`);
     } else {
-      this.setState({ faileSignUp: true });
+      let errorMessage = "";
+      switch (signUpResponse.status) {
+        case 400:
+          errorMessage = "Invalid sign up request";
+          break;
+        case 409:
+          errorMessage = "Username already taken";
+          break;
+        case 500:
+          errorMessage = "Internal server error";
+          break;
+      }
+      this.setState({ errorMessage });
     }
   };
 
@@ -70,9 +98,8 @@ export default class App extends Component {
             />
           </FormGroup>
           <Button onClick={this.handleLogin}>Log in</Button>
-          <Button onClick={this.handlesignUp}>signUp</Button>
-          {this.state.failedLogin && <p>Log in attempt failed!</p>}
-          {this.state.faileSignUp && <p>Sign up attempt failed!</p>}
+          <Button onClick={this.handlesignUp}>Sign up</Button>
+          <p>{this.state.errorMessage}</p>
         </Form>
       </div>
     );
