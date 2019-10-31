@@ -1,25 +1,33 @@
 import React, { Component } from "react";
-import { Head } from "../components";
+import { Head } from "../../components";
 import { Button, Container, Input } from "reactstrap";
 import Dropzone from "react-dropzone";
+import {withRouter} from "next/router"
+import { getFriend, changeFriendName } from "../../utils/ApiWrapper";
 
 class FriendDetailPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: "Alice",
+      friend: {},
       isEditingName: false,
       sentiment: "Happy",
       files: "File1"
     };
   }
 
+  async componentDidMount() {
+    await this.getFriendWrapper();
+  }
+
   getFriendWrapper = async () => {
     const { friendId } = this.props.router.query;
+    console.log(friendId)
     this.setState({
       friendId
     })
     let friend = await getFriend(friendId);
+    console.log(friend)
     this.setState({
       friend
     });
@@ -43,11 +51,12 @@ class FriendDetailPage extends Component {
     });
   };
 
-  changeName = () => {
-    this.setState({
-      name: this.state.newName,
-      isEditingName: false
-    });
+  changeName = async () => {
+    const newFriend = {
+      name: this.state.newName
+    }
+    await changeFriendName(this.state.friend.friendId, newFriend)
+    await this.getFriendWrapper()
   };
 
   cancelEditName = () => {
@@ -95,4 +104,4 @@ class FriendDetailPage extends Component {
   }
 }
 
-export default FriendPage;
+export default withRouter(FriendDetailPage);

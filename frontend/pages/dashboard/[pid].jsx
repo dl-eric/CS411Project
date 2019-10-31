@@ -115,7 +115,7 @@ class FriendPage extends Component {
               <Card>
                 <CardBody>
                   <CardTitle>
-                  <Link href={{ pathname: `/dashboard/${this.state.userId}/${friend.friendId}`}}>
+                  <Link href={{ pathname: `/friend/${friend.friendId}`}}>
                         <a className="regular-anchor">{friend.name}</a>
                   </Link>
                   </CardTitle>

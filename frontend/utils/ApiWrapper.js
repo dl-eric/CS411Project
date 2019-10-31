@@ -67,12 +67,24 @@ export const getFriend = friendId =>
     .get(`${BACKEND_URL}/friends/${friendId}`)
     .then(response => {
       console.log(response);
-      return response.data.result.friend;
+      return response.data.result;
     })
     .catch(error => {
       console.log(error);
       return error.response;
     });
+
+export const changeFriendName = (friendId, friend) =>
+  axios
+  .put(`${BACKEND_URL}/friends/${friendId}`, friend)
+  .then(response => {
+    console.log(response);
+    return response;
+  })
+  .catch(error => {
+    console.log(error);
+    return error.response;
+});
 
 
 export const getSentiments = id => [
