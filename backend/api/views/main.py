@@ -2,6 +2,7 @@ from flask import Blueprint, request
 from api.models import db
 from api.core import create_response, serialize_list, logger
 from sqlalchemy import inspect
+from sqlalchemy.exc import IntegrityError
 
 main = Blueprint("main", __name__)  # initialize blueprint
 
@@ -17,31 +18,49 @@ def index():
 
 @main.route('/signup', methods=['POST'])
 def signup():
-    username = request.args.get('username')
-    password = request.args.get('password')
+    body = request.get_json()
+    if not body:
+        return create_response(status=400, message="Not JSON")
+    
+    username = body.get('username')
+    password = body.get('password')
 
     if not username or not password:
         return create_response(status=400)
 
-    result = db.session.execute('INSERT INTO User (username, password) VALUES (:username, :password)', {'username': username, 'password': password})
-    print(result)
-    return create_response(status=200)
+    try:
+        result = db.session.execute('INSERT INTO User (username, password) VALUES (:username, :password)', {'username': username, 'password': password})
+        db.session.commit()
+    except IntegrityError:
+        return create_response(status=409, message="User already exists")
+    except Exception as e:
+        return create_response(status=500, message="Something went wrong")
+    
+    # Get the userId of the user we just created so we can return it
+    result = db.session.execute('SELECT userId FROM User WHERE username=:username', {'username': username})
+    user = result.fetchone()
+
+    return create_response(data={'userId': user.userId}, status=200)
 
 
 @main.route("/login", methods=['POST'])
 def login():
-    username = request.args.get('username')
-    password = request.args.get('password')
-
-    result = db.session.execute('SELECT * FROM User WHERE username=:username', {'username': username})
+    body = request.get_json()
+    if not body:
+        return create_response(status=400, message="Not JSON")
     
+    username = body.get('username')
+    password = body.get('password')
+
+    result = db.session.execute('SELECT * FROM User WHERE username=:username', {'username': username})    
     user = result.fetchone()
+    result.close()
 
     if user:
         if user.password == password:
             return create_response(data={'userId': user.userId})
         else:
-            return create_response(status=401)
+            return create_response(status=401, message="Password incorrect")
     else:
         return create_response(status=404, message="User not found")
 
