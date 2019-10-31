@@ -84,7 +84,7 @@ def friends():
             result = db.session.execute('SELECT * FROM Friend WHERE userId=:userId', {'userId': user_id})
             friends = []
             for friend in result:
-                friends.append(friend.name)
+                friends.append({'name': friend.name, 'friendId': friend.friendId})
 
             return create_response(data={'friends': friends})
         else:
