@@ -34,8 +34,7 @@ export const addFriend = (name, userID) => ({
 
 export const getSentiments = id => [
   { id: id, sentiment: "happy" },
-  { id: id, sentiment: "sad" },
-  { id: id, sentiment: "angry" }
+  { id: id, sentiment: "sad" }
 ];
 
 export const editFriend = (id, name) => ({
@@ -49,8 +48,6 @@ export const addSentiment = (id, sentiment) => ({
 });
 
 export const deleteSentiment = (id, sentiment) =>
-  [
-    { id: id, sentiment: "happy" },
-    { id: id, sentiment: "sad" },
-    { id: id, sentiment: "angry" }
-  ].filter(entry => entry.id !== id && entry.sentiment !== sentiment);
+  [{ id: id, sentiment: "happy" }, { id: id, sentiment: "sad" }].filter(
+    entry => entry.id !== id && entry.sentiment !== sentiment
+  );
