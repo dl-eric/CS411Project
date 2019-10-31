@@ -27,7 +27,9 @@ export default class App extends Component {
 
   handleLogin = async () => {
     this.setState({ errorMessage: "" });
+
     const loginResponse = await login(this.state.username, this.state.password);
+
     if (loginResponse.status === 200) {
       //Router.push(`/friendPage/${loginResponse.id}`);
       console.log("successful log in");
@@ -59,6 +61,7 @@ export default class App extends Component {
       this.state.username,
       this.state.password
     );
+
     if (signUpResponse.status === 200) {
       console.log("successful sign up");
       //Router.push(`/friendPage/${signUpSuccess.id}`);
