@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { Head } from "../../components";
 import {
+  CardHeader,
+  Container,
   Button,
   Row,
   Col,
@@ -13,7 +15,8 @@ import {
   Form,
   Input,
   FormGroup,
-  Label
+  Label,
+  CardFooter
 } from "reactstrap";
 import { getFriends, addFriend } from "../../utils/ApiWrapper";
 import Router, { withRouter } from "next/router";
@@ -78,6 +81,7 @@ class FriendPage extends Component {
   render() {
     return (
       <div className="app">
+        <Container fluid>
         <Head />
         <h1 align="center">Your Friends</h1>
         <Modal isOpen={this.state.modalOpen}>
@@ -103,24 +107,24 @@ class FriendPage extends Component {
             </Button>
           </ModalFooter>
         </Modal>
-        <Button color="primary" onClick={this.openModal}>
+        <Button className="action-btn" color="primary" onClick={this.openModal}>
           Add New Friend
         </Button>
-        <Button color="secondary">Logout</Button>
+        <Button className="logout-btn" color="danger">Logout</Button>
 
         <Row>
           {this.state.friends.map(friend => (
-            <Col md="4" key={friend.friendId}>
-              <Button onClick={() => Router.push(`/friend/${friend.friendId}`)}>
-                <Card>
-                  <CardBody>
-                    <CardTitle>{friend.name}</CardTitle>
-                  </CardBody>
+            <Col md="3" key={friend.friendId}>
+                <Card className='friend-card'>
+                  <CardHeader><h3 align="center">{friend.name}</h3></CardHeader>
+                  <CardFooter>
+                    <Button className="detail-btn" onClick={() => Router.push(`/friend/${friend.friendId}`)}>Details</Button>
+                  </CardFooter>
                 </Card>
-              </Button>
             </Col>
           ))}
         </Row>
+        </Container>
       </div>
     );
   }
