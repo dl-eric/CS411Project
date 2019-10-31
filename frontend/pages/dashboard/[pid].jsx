@@ -19,7 +19,7 @@ import {
 import { getFriends, addFriend } from "../../utils/ApiWrapper";
 import Router, { withRouter } from "next/router";
 
-import "../../static/style.scss";
+import "../../public/style.scss";
 
 class FriendPage extends Component {
   constructor(props) {
@@ -80,7 +80,7 @@ class FriendPage extends Component {
     return (
       <div className="app">
         <Container fluid>
-          <Head />
+          <Head title="Dashboard" />
           <h1 align="center">Your Friends</h1>
           <Modal isOpen={this.state.modalOpen}>
             <ModalBody>

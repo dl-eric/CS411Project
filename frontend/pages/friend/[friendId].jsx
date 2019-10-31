@@ -70,7 +70,7 @@ class FriendDetailPage extends Component {
     return (
       <div className="app">
         <Container fluid>
-          <Head />
+          <Head title="Friend" />
           <h1 align="center">{this.state.friend.name}</h1>
           <Button color="primary" onClick={this.editName}>
             Edit Name

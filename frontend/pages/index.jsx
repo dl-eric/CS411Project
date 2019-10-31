@@ -7,6 +7,7 @@ import { Head } from "../components";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { setExample } from "../redux/actions";
+import Router from "next/router";
 
 import { helloWorld } from "../utils/ApiWrapper";
 
@@ -47,6 +48,7 @@ export default connect(
     }
 
     async componentDidMount() {
+      Router.push("/login");
       const hello = await helloWorld();
       console.log("hello: ", hello);
       if (hello) {
