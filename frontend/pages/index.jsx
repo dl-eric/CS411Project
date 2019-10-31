@@ -10,7 +10,7 @@ import { setExample } from "../redux/actions";
 
 import { helloWorld } from "../utils/ApiWrapper";
 
-import "../static/style.scss";
+// import "../static/style.scss";
 
 /**
  * Fetches Redux state and assigns it to props.
