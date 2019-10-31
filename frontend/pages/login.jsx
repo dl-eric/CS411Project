@@ -8,7 +8,7 @@ import { Button, Form, FormGroup, Input } from "reactstrap";
 
 import Router from "next/router";
 
-import { login, register } from "../utils/ApiWrapper";
+import { login, signUp } from "../utils/ApiWrapper";
 
 import "../static/style.scss";
 
@@ -22,7 +22,7 @@ export default class App extends Component {
       username: "",
       password: "",
       failedLogin: false,
-      failedRegister: false
+      faileSignUp: false
     };
   }
 
@@ -31,27 +31,27 @@ export default class App extends Component {
   updatePassword = event => this.setState({ password: event.target.value });
 
   handleLogin = async () => {
-    this.setState({ failedRegister: false });
+    this.setState({ faileSignUp: false });
     const loginSuccess = await login(this.state.username, this.state.password);
     if (loginSuccess !== null) {
       this.setState({ username: "", password: "", failedLogin: false });
-      Router.push(`/friendsPage/${loginSuccess.id}`);
+      Router.push(`/friendPage/${loginSuccess.id}`);
     } else {
       this.setState({ failedLogin: true });
     }
   };
 
-  handleRegister = async () => {
+  handlesignUp = async () => {
     this.setState({ failedLogin: false });
-    const registerSuccess = await register(
+    const signUpSuccess = await signUp(
       this.state.username,
       this.state.password
     );
-    if (registerSuccess !== null) {
-      this.setState({ username: "", password: "", failedRegister: false });
-      Router.push(`/friendsPage/${registerSuccess.id}`);
+    if (signUpSuccess !== null) {
+      this.setState({ username: "", password: "", faileSignUp: false });
+      Router.push(`/friendPage/${signUpSuccess.id}`);
     } else {
-      this.setState({ failedRegister: true });
+      this.setState({ faileSignUp: true });
     }
   };
 
@@ -74,9 +74,9 @@ export default class App extends Component {
             />
           </FormGroup>
           <Button onClick={this.handleLogin}>Log in</Button>
-          <Button onClick={this.handleRegister}>Register</Button>
+          <Button onClick={this.handlesignUp}>signUp</Button>
           {this.state.failedLogin && <p>Log in attempt failed!</p>}
-          {this.state.failedRegister && <p>Register attempt failed!</p>}
+          {this.state.faileSignUp && <p>Sign up attempt failed!</p>}
         </Form>
       </div>
     );

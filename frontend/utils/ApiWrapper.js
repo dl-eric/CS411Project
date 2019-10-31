@@ -15,10 +15,16 @@ export const helloWorld = () =>
     });
 
 export const login = (username, password) =>
-  username === password ? { id: 1 } : null;
+  axios.post(`${BACKEND_URL}/login`).then(respone => {
+    console.log(response);
+    return response;
+  });
 
-export const register = (username, password) =>
-  username !== "username" && username === password ? { id: 2 } : null;
+export const signUp = (username, password) =>
+  axios.post(`${BACKEND_URL}/signup`).then(respone => {
+    console.log(response);
+    return response;
+  });
 
 export const getFriends = userID => [
   { name: "Alice", id: `${userID}1` },
