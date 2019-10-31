@@ -14,8 +14,8 @@ import {
   FormGroup,
   Label
 } from "reactstrap";
-import { getFriends } from "../utils/ApiWrapper"
-import { useRouter as Router } from 'next/router'
+import { getFriends } from "../utils/ApiWrapper";
+import { useRouter as Router, withRouter } from "next/router";
 
 class FriendPage extends Component {
   constructor(props) {
@@ -26,18 +26,21 @@ class FriendPage extends Component {
     };
   }
 
-  async componentDidMount() {
-    const router = Router()
-    const { pid } = router.query
-    await getFriendsWrapper({pid})
+  static async getInitialProps(router) {
+    console.log(router);
   }
 
-  getFriendsWrapper = async (id) => {
-      friends = getFriends(id)
-      this.setState({
-          friends
-      })
+  async componentDidMount() {
+    const { pid } = this.props.router.query;
+    await getFriendsWrapper({ pid });
   }
+
+  getFriendsWrapper = async id => {
+    friends = getFriends(id);
+    this.setState({
+      friends
+    });
+  };
 
   openModal = () => {
     this.setState({
@@ -113,4 +116,4 @@ class FriendPage extends Component {
   }
 }
 
-export default FriendPage;
+export default withRouter(FriendPage);
