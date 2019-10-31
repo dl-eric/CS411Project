@@ -108,7 +108,34 @@ def friends():
 
 @main.route('/friends/<id>', methods=['PUT', 'DELETE'])
 def friend(id):
-    return Response(status=200)
+    if request.method == 'DELETE':
+        # Check if friend exists
+        result = db.session.execute('SELECT * FROM Friend WHERE friendId=:id', {'id': id})
+        friend = result.fetchone()
+
+        if not friend:
+            return create_response(status=404, message="Friend not found")
+
+        try:
+            result = db.session.execute('DELETE FROM Friend WHERE friendId=:id', {'id': id})
+            db.session.commit()
+            return create_response(status=200, message="Friend successfully deleted")
+        except Exception as e:
+            return create_response(status=500, message="Something went wrong...")
+
+    # We're in the PUT flow. User wants to edit the friend
+    body = request.get_json()
+    if not body:
+        return create_response(status=400, message="Not JSON")
+
+    name = body.get('name')
+
+    if not name:
+        return create_response(status=400, message="Name field needs to be supplied")
+
+    result = db.session.execute('UPDATE Friend SET name=:name WHERE friendId=:id', {'name': name, 'id': id})
+    db.session.commit()
+    return create_response(status=200)
 
 
 @main.route('/sentiments', methods=['POST'])
