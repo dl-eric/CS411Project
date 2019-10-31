@@ -38,18 +38,42 @@ export const signUp = (username, password) =>
       return error.response;
     });
 
-export const getFriends = userID => [
-  { name: "Alice", id: `${userID}1` },
-  { name: "Arpan", id: `${userID}2` },
-  { name: "Hyunsoo", id: `${userID}3` },
-  { name: "Eric", id: `${userID}4` }
-];
+export const addFriend = (friend) =>
+  axios
+    .post(`${BACKEND_URL}/friends`, friend)
+    .then(response => {
+      console.log(response);
+      return response;
+    })
+    .catch(error => {
+      console.log(error);
+      return error.response;
+    });
 
-export const addFriend = (name, userID) => ({
-  id: 5,
-  name: name,
-  userID: userID
-});
+export const getFriends = userId =>
+  axios
+    .get(`${BACKEND_URL}/friends?userId=${userId}`)
+    .then(response => {
+      console.log(response);
+      return response.data.result.friends;
+    })
+    .catch(error => {
+      console.log(error);
+      return error.response;
+    });
+
+export const getFriend = friendId =>
+  axios
+    .get(`${BACKEND_URL}/friends/${friendId}`)
+    .then(response => {
+      console.log(response);
+      return response.data.result.friend;
+    })
+    .catch(error => {
+      console.log(error);
+      return error.response;
+    });
+
 
 export const getSentiments = id => [
   { id: id, sentiment: "happy" },

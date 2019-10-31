@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Head } from "../components";
+import { Head } from "../../components";
 import {
   Button,
   Row,
@@ -15,27 +15,32 @@ import {
   FormGroup,
   Label
 } from "reactstrap";
-import { getFriends } from "../utils/ApiWrapper";
+import { getFriends, addFriend } from "../../utils/ApiWrapper";
 import { withRouter } from "next/router";
+import Link from 'next/link'
 
-import "../static/style.scss";
+import "../../static/style.scss";
 
 class FriendPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
       friends: [],
-      modalOpen: false
+      modalOpen: false,
+      userId: 0
     };
   }
 
   async componentDidMount() {
-    const { pid } = this.props.router.query;
-    await this.getFriendsWrapper({ pid });
+    await this.getFriendsWrapper();
   }
 
-  getFriendsWrapper = async id => {
-    let friends = await getFriends(id);
+  getFriendsWrapper = async () => {
+    const { pid } = this.props.router.query;
+    this.setState({
+      userId: pid
+    })
+    let friends = await getFriends(pid);
     this.setState({
       friends
     });
@@ -53,12 +58,16 @@ class FriendPage extends Component {
     });
   };
 
-  addFriend = () => {
-    let friendsArr = this.state.friends;
-    friendsArr.push(this.state.newFriend);
+  createFriend = async () => {
+    let newFriend = {
+        name: this.state.newFriend,
+        userId: this.state.userId
+    }
+    await addFriend(newFriend)
     this.setState({
-      friends: friendsArr
+      modalOpen: false
     });
+    await this.getFriendsWrapper()
   };
 
   handleChange = e => {
@@ -90,7 +99,7 @@ class FriendPage extends Component {
             <Button color="secondary" onClick={this.closeModal}>
               Cancel
             </Button>
-            <Button color="primary" onClick={this.addFriend}>
+            <Button color="primary" onClick={this.createFriend}>
               Submit
             </Button>
           </ModalFooter>
@@ -102,10 +111,14 @@ class FriendPage extends Component {
 
         <Row>
           {this.state.friends.map(friend => (
-            <Col md="4" key={friend.id}>
+            <Col md="4" key={friend.friendId}>
               <Card>
                 <CardBody>
-                  <CardTitle>{friend.name}</CardTitle>
+                  <CardTitle>
+                  <Link href={{ pathname: `/dashboard/${this.state.userId}/${friend.friendId}`}}>
+                        <a className="regular-anchor">{friend.name}</a>
+                  </Link>
+                  </CardTitle>
                 </CardBody>
               </Card>
             </Col>
