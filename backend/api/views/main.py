@@ -1,5 +1,5 @@
-from flask import Blueprint, request, Response
-from api.models import db, Person, Email
+from flask import Blueprint, request
+from api.models import db
 from api.core import create_response, serialize_list, logger
 from sqlalchemy import inspect
 
@@ -17,20 +17,45 @@ def index():
 
 @main.route('/signup', methods=['POST'])
 def signup():
-    return Response(status=200)
+    username = request.args.get('username')
+    password = request.args.get('password')
+
+    if not username or not password:
+        return create_response(status=400)
+
+    result = db.session.execute('INSERT INTO User (username, password) VALUES (:username, :password)', {'username': username, 'password': password})
+    print(result)
+    return create_response(status=200)
+
 
 @main.route("/login", methods=['POST'])
 def login():
-    return Response(status=200)
+    username = request.args.get('username')
+    password = request.args.get('password')
+
+    result = db.session.execute('SELECT * FROM User WHERE username=:username', {'username': username})
+    
+    user = result.fetchone()
+
+    if user:
+        if user.password == password:
+            return create_response(data={'userId': user.userId})
+        else:
+            return create_response(status=401)
+    else:
+        return create_response(status=404, message="User not found")
 
 
 @main.route('/friends', methods=['GET', 'POST'])
 def friends():
     return Response(status=200)
 
+
 @main.route('/friends/<id>', methods=['PUT', 'DELETE'])
 def friend(id):
     return Response(status=200)
 
+
 @main.route('/sentiments', methods=['POST'])
+def sentiments():
     return Response(status=200)
