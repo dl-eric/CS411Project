@@ -18,18 +18,13 @@ export default class Head extends Component {
         <meta charSet="UTF-8" />
         <meta
           name="description"
-          content={
-            this.props.description ||
-            "A React boilerplate written in TypeScript with support for Next.js, Redux, and SCSS"
-          }
+          content={this.props.description || "CS 411 Final Project"}
         />
+        <meta name="keywords" content={this.props.keywords || ""} />
         <meta
-          name="keywords"
-          content={
-            this.props.keywords || "React, Next, Redux, SCSS, Boilerplate"
-          }
+          name="author"
+          content="Alice Fang, Arpan Laha, Eric Lee, Hyunsoo Lee"
         />
-        <meta name="author" content="Arpan Laha" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link
           rel="stylesheet"
@@ -38,7 +33,7 @@ export default class Head extends Component {
         <title>
           {`${
             this.props.title ? `${this.props.title} | ` : ""
-          }React Boilerplate`}
+          }CS 411 Final Project`}
         </title>
       </NextHead>
     );
