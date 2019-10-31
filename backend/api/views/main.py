@@ -15,8 +15,11 @@ def index():
     logger.info("Hello World!")
     return "Hello World!"
 
+@main.route('/signup', methods=['POST'])
+def signup():
+    return Response(status=200)
 
-@main.route("/login", methods=["POST"])
+@main.route("/login", methods=['POST'])
 def login():
     return Response(status=200)
 
