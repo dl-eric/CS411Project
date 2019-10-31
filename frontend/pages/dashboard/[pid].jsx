@@ -7,8 +7,6 @@ import {
   Row,
   Col,
   Card,
-  CardBody,
-  CardTitle,
   Modal,
   ModalBody,
   ModalFooter,
@@ -82,48 +80,61 @@ class FriendPage extends Component {
     return (
       <div className="app">
         <Container fluid>
-        <Head />
-        <h1 align="center">Your Friends</h1>
-        <Modal isOpen={this.state.modalOpen}>
-          <ModalBody>
-            <Form>
-              <FormGroup>
-                <Label>Name</Label>
-                <Input
-                  name="newFriend"
-                  placeholder="Enter Name"
-                  onChange={this.handleChange}
-                  onKeyPress={this.handleKeyPress}
-                />
-              </FormGroup>
-            </Form>
-          </ModalBody>
-          <ModalFooter>
-            <Button color="secondary" onClick={this.closeModal}>
-              Cancel
-            </Button>
-            <Button color="primary" onClick={this.createFriend}>
-              Submit
-            </Button>
-          </ModalFooter>
-        </Modal>
-        <Button className="action-btn" color="primary" onClick={this.openModal}>
-          Add New Friend
-        </Button>
-        <Button className="logout-btn" color="danger">Logout</Button>
+          <Head />
+          <h1 align="center">Your Friends</h1>
+          <Modal isOpen={this.state.modalOpen}>
+            <ModalBody>
+              <Form>
+                <FormGroup>
+                  <Label>Name</Label>
+                  <Input
+                    name="newFriend"
+                    placeholder="Enter Name"
+                    onChange={this.handleChange}
+                    onKeyPress={this.handleKeyPress}
+                  />
+                </FormGroup>
+              </Form>
+            </ModalBody>
+            <ModalFooter>
+              <Button color="secondary" onClick={this.closeModal}>
+                Cancel
+              </Button>
+              <Button color="primary" onClick={this.createFriend}>
+                Submit
+              </Button>
+            </ModalFooter>
+          </Modal>
+          <Button
+            className="action-btn"
+            color="primary"
+            onClick={this.openModal}
+          >
+            Add New Friend
+          </Button>
+          <Button className="logout-btn" color="danger">
+            Logout
+          </Button>
 
-        <Row>
-          {this.state.friends.map(friend => (
-            <Col md="3" key={friend.friendId}>
-                <Card className='friend-card'>
-                  <CardHeader><h3 align="center">{friend.name}</h3></CardHeader>
+          <Row>
+            {this.state.friends.map(friend => (
+              <Col md="3" key={friend.friendId}>
+                <Card className="friend-card">
+                  <CardHeader>
+                    <h3 align="center">{friend.name}</h3>
+                  </CardHeader>
                   <CardFooter>
-                    <Button className="detail-btn" onClick={() => Router.push(`/friend/${friend.friendId}`)}>Details</Button>
+                    <Button
+                      className="detail-btn"
+                      onClick={() => Router.push(`/friend/${friend.friendId}`)}
+                    >
+                      Details
+                    </Button>
                   </CardFooter>
                 </Card>
-            </Col>
-          ))}
-        </Row>
+              </Col>
+            ))}
+          </Row>
         </Container>
       </div>
     );
