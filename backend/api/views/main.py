@@ -140,7 +140,7 @@ def friend(id):
     
     # We're in GET flow. User wants friend info
     friend = dict(friend.items())
-    return create_response(data=obj, status=200)
+    return create_response(data=friend, status=200)
 
 
 @main.route('/sentiments', methods=['POST'])
@@ -165,15 +165,31 @@ def sentiments():
 
     return create_response(status=200, message="Successfully created sentiment")
 
-@main.route('/sentiments/<id>', methods=['GET'])
+@main.route('/sentiments/<id>', methods=['PUT', 'GET'])
 def get_sentiment(id):
+    if request.method == 'PUT':
+        # We're in the PUT flow. User wants to edit the friend
+        body = request.get_json()
+        if not body:
+            return create_response(status=400, message="Not JSON")
+
+        filename = body.get('filename')
+
+        if not filename:
+            return create_response(status=400, message="Filename field needs to be supplied")
+
+        result = db.session.execute('UPDATE Sentiment SET fileName=:filename WHERE friendId=:id', {'filename': filename, 'id': id})
+        db.session.commit()
+        return create_response(status=200, message="Successfully updated Sentiment")
+
     # Check if sentiment exists
     result = db.session.execute('SELECT * FROM Sentiment WHERE friendId=:id', {'id': id})
     sentiment = result.fetchone()
 
     if not sentiment:
         return create_response(status=404, message="Sentiment not found.")
-    
+
+    # We're in GET flow
     sentiment = dict(sentiment.items())
 
     return create_response(data=sentiment, status=200)
