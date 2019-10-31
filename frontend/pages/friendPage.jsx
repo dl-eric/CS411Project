@@ -4,11 +4,9 @@ import {
   Button,
   Row,
   Col,
-  Container,
   Card,
   CardBody,
   CardTitle,
-  CardText,
   Modal,
   ModalBody,
   ModalFooter,
@@ -55,7 +53,7 @@ class FriendPage extends Component {
     });
   };
 
-  handleKeyPress = () => {};
+  //   handleKeyPress = () => {};
   render() {
     return (
       <div className="App">
@@ -91,7 +89,7 @@ class FriendPage extends Component {
 
         <Row>
           {this.state.friends.map(friend => (
-            <Col md="4">
+            <Col md="4" key={friend.id}>
               <Card>
                 <CardBody>
                   <CardTitle>{friend}</CardTitle>

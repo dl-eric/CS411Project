@@ -1,7 +1,3 @@
-/**
- * @file The home page.
- */
-
 import React, { Component } from "react";
 import { Head } from "../components";
 import { Button, Form, FormGroup, Input } from "reactstrap";

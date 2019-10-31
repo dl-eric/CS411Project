@@ -15,13 +15,13 @@ export const helloWorld = () =>
     });
 
 export const login = (username, password) =>
-  axios.post(`${BACKEND_URL}/login`).then(respone => {
+  axios.post(`${BACKEND_URL}/login`, { username, password }).then(response => {
     console.log(response);
     return response;
   });
 
 export const signUp = (username, password) =>
-  axios.post(`${BACKEND_URL}/signup`).then(respone => {
+  axios.post(`${BACKEND_URL}/signup`, { username, password }).then(response => {
     console.log(response);
     return response;
   });
