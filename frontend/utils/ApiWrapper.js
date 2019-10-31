@@ -38,7 +38,7 @@ export const signUp = (username, password) =>
       return error.response;
     });
 
-export const addFriend = (friend) =>
+export const addFriend = friend =>
   axios
     .post(`${BACKEND_URL}/friends`, friend)
     .then(response => {
@@ -76,16 +76,15 @@ export const getFriend = friendId =>
 
 export const changeFriendName = (friendId, friend) =>
   axios
-  .put(`${BACKEND_URL}/friends/${friendId}`, friend)
-  .then(response => {
-    console.log(response);
-    return response;
-  })
-  .catch(error => {
-    console.log(error);
-    return error.response;
-});
-
+    .put(`${BACKEND_URL}/friends/${friendId}`, friend)
+    .then(response => {
+      console.log(response);
+      return response;
+    })
+    .catch(error => {
+      console.log(error);
+      return error.response;
+    });
 
 export const getSentiments = id => [
   { id: id, sentiment: "happy" },

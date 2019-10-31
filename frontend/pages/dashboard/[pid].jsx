@@ -16,8 +16,7 @@ import {
   Label
 } from "reactstrap";
 import { getFriends, addFriend } from "../../utils/ApiWrapper";
-import { withRouter } from "next/router";
-import Link from 'next/link'
+import Router, { withRouter } from "next/router";
 
 import "../../static/style.scss";
 
@@ -39,7 +38,7 @@ class FriendPage extends Component {
     const { pid } = this.props.router.query;
     this.setState({
       userId: pid
-    })
+    });
     let friends = await getFriends(pid);
     this.setState({
       friends
@@ -60,14 +59,14 @@ class FriendPage extends Component {
 
   createFriend = async () => {
     let newFriend = {
-        name: this.state.newFriend,
-        userId: this.state.userId
-    }
-    await addFriend(newFriend)
+      name: this.state.newFriend,
+      userId: this.state.userId
+    };
+    await addFriend(newFriend);
     this.setState({
       modalOpen: false
     });
-    await this.getFriendsWrapper()
+    await this.getFriendsWrapper();
   };
 
   handleChange = e => {
@@ -112,15 +111,13 @@ class FriendPage extends Component {
         <Row>
           {this.state.friends.map(friend => (
             <Col md="4" key={friend.friendId}>
-              <Card>
-                <CardBody>
-                  <CardTitle>
-                  <Link href={{ pathname: `/friend/${friend.friendId}`}}>
-                        <a className="regular-anchor">{friend.name}</a>
-                  </Link>
-                  </CardTitle>
-                </CardBody>
-              </Card>
+              <Button onClick={() => Router.push(`/friend/${friend.friendId}`)}>
+                <Card>
+                  <CardBody>
+                    <CardTitle>{friend.name}</CardTitle>
+                  </CardBody>
+                </Card>
+              </Button>
             </Col>
           ))}
         </Row>
