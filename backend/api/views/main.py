@@ -84,7 +84,7 @@ def friends():
             result = db.session.execute('SELECT * FROM Friend WHERE userId=:userId', {'userId': user_id})
             friends = []
             for friend in result:
-                friends.append(friend.name)
+                friends.append({'name': friend.name, 'friendId': friend.friendId})
 
             return create_response(data={'friends': friends})
         else:
@@ -135,9 +135,27 @@ def friend(id):
 
     result = db.session.execute('UPDATE Friend SET name=:name WHERE friendId=:id', {'name': name, 'id': id})
     db.session.commit()
-    return create_response(status=200)
+    return create_response(status=200, message="Successfully updated friend")
 
 
 @main.route('/sentiments', methods=['POST'])
 def sentiments():
-    return Response(status=200)
+    body = request.get_json()
+    if not body:
+        return create_response(status=400, message="Not JSON")
+
+    friend_id = body.get('friendId')
+    filename = body.get('filename')
+
+    if not friend_id or not filename:
+        return create_response(status=400, message="friendId and filename fields need to be supplied")
+
+    try:
+        result = db.session.execute('INSERT INTO Sentiment (friendId, fileName) VALUES (:friend_id, :filename)', {'friend_id': friend_id, 'filename': filename})
+        db.session.commit()
+    except IntegrityError:
+        return create_response(status=400, message="Invalid friendId")
+    except Exception as e:
+        return create_response(status=500, message="Something went wrong...")
+
+    return create_response(status=200, message="Successfully created sentiment")
