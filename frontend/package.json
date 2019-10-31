@@ -12,6 +12,7 @@
     "react": "^16.10.1",
     "react-dom": "^16.10.1",
     "react-redux": "^7.1.1",
+    "reactstrap": "^8.1.1",
     "redux": "^4.0.1",
     "redux-devtools-extension": "^2.13.8"
   },

@@ -14,10 +14,11 @@ export const helloWorld = () =>
       return null;
     });
 
-export const login = (username, password) => username === password;
+export const login = (username, password) =>
+  username === password ? { id: 1 } : null;
 
 export const register = (username, password) =>
-  username !== "username" && username === password;
+  username !== "username" && username === password ? { id: 2 } : null;
 
 export const getFriends = userID => [
   { name: "Alice", id: `${userID}1` },
