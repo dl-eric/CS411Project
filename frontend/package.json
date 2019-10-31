@@ -4,16 +4,19 @@
   "dependencies": {
     "@zeit/next-sass": "^1.0.1",
     "axios": "^0.19.0",
+    "bootstrap": "^4.3.1",
     "css-loader": "^3.2.0",
     "next": "^9.0.7",
     "next-page-transitions": "^1.0.0-beta.2",
     "next-redux-wrapper": "^3.0.0",
     "node-sass": "^4.12.0",
-    "react": "^16.10.1",
-    "react-dom": "^16.10.1",
+    "react": "^16.11.0",
+    "react-dom": "^16.11.0",
     "react-redux": "^7.1.1",
+    "reactstrap": "^8.1.1",
     "redux": "^4.0.1",
-    "redux-devtools-extension": "^2.13.8"
+    "redux-devtools-extension": "^2.13.8",
+    "style-loader": "^1.0.0"
   },
   "scripts": {
     "build": "next build",
