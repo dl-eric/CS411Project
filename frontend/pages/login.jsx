@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Head } from "../components";
 import { Button, Form, FormGroup, Input } from "reactstrap";
 
-//import Router from "next/router";
+import Router from "next/router";
 
 import { login, signUp } from "../utils/ApiWrapper";
 
@@ -31,10 +31,8 @@ export default class App extends Component {
     const loginResponse = await login(this.state.username, this.state.password);
 
     if (loginResponse.status === 200) {
-      //Router.push(`/friendPage/${loginResponse.id}`);
-      console.log("successful log in");
+      Router.push(`/dashboard/${loginResponse.data.result.userId}`);
     } else {
-      console.log(loginResponse);
       let errorMessage = "";
       switch (loginResponse.status) {
         case 400:
@@ -63,8 +61,7 @@ export default class App extends Component {
     );
 
     if (signUpResponse.status === 200) {
-      console.log("successful sign up");
-      //Router.push(`/friendPage/${signUpSuccess.id}`);
+      Router.push(`/dashboard/${signUpResponse.data.result.userId}`);
     } else {
       let errorMessage = "";
       switch (signUpResponse.status) {
