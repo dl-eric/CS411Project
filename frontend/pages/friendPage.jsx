@@ -3,11 +3,9 @@ import {
   Button,
   Row,
   Col,
-  Container,
   Card,
   CardBody,
   CardTitle,
-  CardText,
   Modal,
   ModalBody,
   ModalFooter,
@@ -21,7 +19,24 @@ class FriendPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      friends: ["Hyunsoo", "Eric", "Arpan", "Alice"],
+      friends: [
+          {
+              id: '1',
+              name: "Hyunsoo"
+           },
+           {
+                id: '2',
+                name: "Eric"
+           },
+           {
+               id: '3',
+               name: 'Arpan'
+           },
+           {
+               id: '4',
+               name: 'Alice'
+           }
+        ],
       modalOpen: false
     };
   }
@@ -52,7 +67,6 @@ class FriendPage extends Component {
     });
   };
 
-  handleKeyPress = () => {};
   render() {
     return (
       <div className="app">
@@ -87,10 +101,10 @@ class FriendPage extends Component {
 
         <Row>
           {this.state.friends.map(friend => (
-            <Col md="4">
+            <Col md="4" key={friend.id}>
               <Card>
                 <CardBody>
-                  <CardTitle>{friend}</CardTitle>
+                  <CardTitle>{friend.name}</CardTitle>
                 </CardBody>
               </Card>
             </Col>
