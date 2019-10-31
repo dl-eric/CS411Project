@@ -3,7 +3,7 @@
  */
 
 import React, { Component } from "react";
-import { Example, Head, LoadWrapper } from "../components";
+import { Head } from "../components";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { setExample } from "../redux/actions";

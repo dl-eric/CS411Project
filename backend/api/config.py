@@ -29,8 +29,15 @@ class DevelopmentConfig(Config):
     cmd in the setup instructions. You can change this to environment variable as well. 
     """
 
+    user = os.environ.get('MYSQL_USER').replace('\r', '')
+    password = os.environ.get('MYSQL_PASSWORD').replace('\r', '')
+    db = os.environ.get('MYSQL_DB').replace('\r', '')
+    ip = os.environ.get('MYSQL_IP').replace('\r', '')
+
+    connection_str = "mysql://" + user + ":" + password + "@" + ip + ":3306/" + db
+
     url = (
-        "postgresql://testusr:password@127.0.0.1:5432/testdb"
+        connection_str
     )  # set the URI to call get_pg_url() once you have `creds.ini` setup
     SQLALCHEMY_DATABASE_URI = url
     DEBUG = True

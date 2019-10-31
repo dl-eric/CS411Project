@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from api.models import db, Person, Email
+from api.models import db
 from api.core import create_response, serialize_list, logger
 from sqlalchemy import inspect
 
@@ -15,37 +15,47 @@ def index():
     logger.info("Hello World!")
     return "Hello World!"
 
+@main.route('/signup', methods=['POST'])
+def signup():
+    username = request.args.get('username')
+    password = request.args.get('password')
 
-# function that is called when you visit /persons
-@main.route("/persons", methods=["GET"])
-def get_persons():
-    persons = Person.query.all()
-    return create_response(data={"persons": serialize_list(persons)})
+    if not username or not password:
+        return create_response(status=400)
+
+    result = db.session.execute('INSERT INTO User (username, password) VALUES (:username, :password)', {'username': username, 'password': password})
+    print(result)
+    return create_response(status=200)
 
 
-# POST request for /persons
-@main.route("/persons", methods=["POST"])
-def create_person():
-    data = request.get_json()
+@main.route("/login", methods=['POST'])
+def login():
+    username = request.args.get('username')
+    password = request.args.get('password')
 
-    logger.info("Data recieved: %s", data)
-    if "name" not in data:
-        msg = "No name provided for person."
-        logger.info(msg)
-        return create_response(status=422, message=msg)
-    if "email" not in data:
-        msg = "No email provided for person."
-        logger.info(msg)
-        return create_response(status=422, message=msg)
+    result = db.session.execute('SELECT * FROM User WHERE username=:username', {'username': username})
+    
+    user = result.fetchone()
 
-    # create SQLAlchemy Objects
-    new_person = Person(name=data["name"])
-    email = Email(email=data["email"])
-    new_person.emails.append(email)
+    if user:
+        if user.password == password:
+            return create_response(data={'userId': user.userId})
+        else:
+            return create_response(status=401)
+    else:
+        return create_response(status=404, message="User not found")
 
-    # commit it to database
-    db.session.add_all([new_person, email])
-    db.session.commit()
-    return create_response(
-        message=f"Successfully created person {new_person.name} with id: {new_person._id}"
-    )
+
+@main.route('/friends', methods=['GET', 'POST'])
+def friends():
+    return Response(status=200)
+
+
+@main.route('/friends/<id>', methods=['PUT', 'DELETE'])
+def friend(id):
+    return Response(status=200)
+
+
+@main.route('/sentiments', methods=['POST'])
+def sentiments():
+    return Response(status=200)
