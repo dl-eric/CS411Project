@@ -156,7 +156,7 @@ def sentiments():
         return create_response(status=400, message="friendId and filename fields need to be supplied")
 
     try:
-        result = db.session.execute('INSERT INTO Sentiment (friendId, fileName) VALUES (:friend_id, :filename)', {'friend_id': friend_id, 'filename': filename})
+        result = db.session.execute('INSERT INTO Sentiment (friendId, filename) VALUES (:friend_id, :filename)', {'friend_id': friend_id, 'filename': filename})
         db.session.commit()
     except IntegrityError:
         return create_response(status=400, message="Invalid friendId")
