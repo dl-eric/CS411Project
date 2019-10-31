@@ -14,31 +14,29 @@ import {
   FormGroup,
   Label
 } from "reactstrap";
+import { getFriends } from "../utils/ApiWrapper"
+import { useRouter as Router } from 'next/router'
 
 class FriendPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      friends: [
-          {
-              id: '1',
-              name: "Hyunsoo"
-           },
-           {
-                id: '2',
-                name: "Eric"
-           },
-           {
-               id: '3',
-               name: 'Arpan'
-           },
-           {
-               id: '4',
-               name: 'Alice'
-           }
-        ],
+      friends: [],
       modalOpen: false
     };
+  }
+
+  async componentDidMount() {
+    const router = Router()
+    const { pid } = router.query
+    await getFriendsWrapper({pid})
+  }
+
+  getFriendsWrapper = async (id) => {
+      friends = getFriends(id)
+      this.setState({
+          friends
+      })
   }
 
   openModal = () => {
