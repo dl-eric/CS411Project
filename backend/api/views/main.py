@@ -140,7 +140,7 @@ def friend(id):
     
     # We're in GET flow. User wants friend info
     friend = dict(friend.items())
-    return create_response(data=obj, status=200)
+    return create_response(data=friend, status=200)
 
 
 @main.route('/sentiments', methods=['POST'])
