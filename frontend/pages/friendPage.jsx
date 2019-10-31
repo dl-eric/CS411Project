@@ -15,7 +15,7 @@ import {
   Label
 } from "reactstrap";
 import { getFriends } from "../utils/ApiWrapper";
-import { useRouter as Router, withRouter } from "next/router";
+import { withRouter } from "next/router";
 
 class FriendPage extends Component {
   constructor(props) {
@@ -26,17 +26,13 @@ class FriendPage extends Component {
     };
   }
 
-  static async getInitialProps(router) {
-    console.log(router);
-  }
-
   async componentDidMount() {
     const { pid } = this.props.router.query;
-    await getFriendsWrapper({ pid });
+    await this.getFriendsWrapper({ pid });
   }
 
   getFriendsWrapper = async id => {
-    friends = getFriends(id);
+    let friends = getFriends(id);
     this.setState({
       friends
     });
