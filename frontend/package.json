@@ -12,6 +12,7 @@
     "node-sass": "^4.13.0",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
+    "react-dropzone": "^10.1.10",
     "react-redux": "^7.1.1",
     "reactstrap": "^8.1.1",
     "redux": "^4.0.1",

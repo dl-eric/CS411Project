@@ -139,11 +139,7 @@ def friend(id):
             return create_response(status=500, message="Something went wrong...")
     
     # We're in GET flow. User wants friend info
-    obj = {}
-    obj['name'] = friend.name
-    obj['friendId'] = friend.friendId
-    obj['userId'] = friend.userId
-
+    friend = dict(friend.items())
     return create_response(data=obj, status=200)
 
 
@@ -160,7 +156,7 @@ def sentiments():
         return create_response(status=400, message="friendId and filename fields need to be supplied")
 
     try:
-        result = db.session.execute('INSERT INTO Sentiment (friendId, fileName) VALUES (:friend_id, :filename)', {'friend_id': friend_id, 'filename': filename})
+        result = db.session.execute('INSERT INTO Sentiment (friendId, filename) VALUES (:friend_id, :filename)', {'friend_id': friend_id, 'filename': filename})
         db.session.commit()
     except IntegrityError:
         return create_response(status=400, message="Invalid friendId")
@@ -168,3 +164,16 @@ def sentiments():
         return create_response(status=500, message="Something went wrong...")
 
     return create_response(status=200, message="Successfully created sentiment")
+
+@main.route('/sentiments/<id>', methods=['GET'])
+def get_sentiment(id):
+    # Check if sentiment exists
+    result = db.session.execute('SELECT * FROM Sentiment WHERE friendId=:id', {'id': id})
+    sentiment = result.fetchone()
+
+    if not sentiment:
+        return create_response(status=404, message="Sentiment not found.")
+    
+    sentiment = dict(sentiment.items())
+
+    return create_response(data=sentiment, status=200)
