@@ -6,7 +6,7 @@ import Router from "next/router";
 
 import { login, signUp } from "../utils/ApiWrapper";
 
-import "../static/style.scss";
+import "../public/style.scss";
 
 /**
  * The home page.

@@ -16,7 +16,7 @@ import {
   Label
 } from "reactstrap";
 
-import "../static/style.scss";
+import "../public/style.scss";
 
 class FriendPage extends Component {
   constructor(props) {
