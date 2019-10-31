@@ -106,36 +106,45 @@ def friends():
     return create_response(message="Successfully created friend")
 
 
-@main.route('/friends/<id>', methods=['PUT', 'DELETE'])
+@main.route('/friends/<id>', methods=['GET', 'PUT', 'DELETE'])
 def friend(id):
+    if request.method == 'PUT':
+        # We're in the PUT flow. User wants to edit the friend
+        body = request.get_json()
+        if not body:
+            return create_response(status=400, message="Not JSON")
+
+        name = body.get('name')
+
+        if not name:
+            return create_response(status=400, message="Name field needs to be supplied")
+
+        result = db.session.execute('UPDATE Friend SET name=:name WHERE friendId=:id', {'name': name, 'id': id})
+        db.session.commit()
+        return create_response(status=200, message="Successfully updated friend")
+
+    # Check if friend exists
+    result = db.session.execute('SELECT * FROM Friend WHERE friendId=:id', {'id': id})
+    friend = result.fetchone()
+
+    if not friend:
+        return create_response(status=404, message="Friend not found")
+
     if request.method == 'DELETE':
-        # Check if friend exists
-        result = db.session.execute('SELECT * FROM Friend WHERE friendId=:id', {'id': id})
-        friend = result.fetchone()
-
-        if not friend:
-            return create_response(status=404, message="Friend not found")
-
         try:
             result = db.session.execute('DELETE FROM Friend WHERE friendId=:id', {'id': id})
             db.session.commit()
             return create_response(status=200, message="Friend successfully deleted")
         except Exception as e:
             return create_response(status=500, message="Something went wrong...")
+    
+    # We're in GET flow. User wants friend info
+    obj = {}
+    obj['name'] = friend.name
+    obj['friendId'] = friend.friendId
+    obj['userId'] = friend.userId
 
-    # We're in the PUT flow. User wants to edit the friend
-    body = request.get_json()
-    if not body:
-        return create_response(status=400, message="Not JSON")
-
-    name = body.get('name')
-
-    if not name:
-        return create_response(status=400, message="Name field needs to be supplied")
-
-    result = db.session.execute('UPDATE Friend SET name=:name WHERE friendId=:id', {'name': name, 'id': id})
-    db.session.commit()
-    return create_response(status=200, message="Successfully updated friend")
+    return create_response(data=obj, status=200)
 
 
 @main.route('/sentiments', methods=['POST'])
