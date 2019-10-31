@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { Head } from "../components";
-import { getFriends } from "../utils/ApiWrapper"
 import { Button, Container, Input } from "reactstrap";
 import Dropzone from "react-dropzone";
 

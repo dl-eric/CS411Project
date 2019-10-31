@@ -52,6 +52,9 @@ def login():
     username = body.get('username')
     password = body.get('password')
 
+    if not username or not password:
+        return create_response(status=400)
+
     result = db.session.execute('SELECT * FROM User WHERE username=:username', {'username': username})    
     user = result.fetchone()
     result.close()
@@ -67,12 +70,72 @@ def login():
 
 @main.route('/friends', methods=['GET', 'POST'])
 def friends():
-    return Response(status=200)
+    if request.method == "GET":
+        user_id = request.args.get('userId')
+        if not user_id:
+            return create_response(status=400, message="Must supply userId")
+
+        # Check if userId exists
+        result = db.session.execute('SELECT * FROM User WHERE userId=:userId', {'userId': user_id})
+        user = result.fetchone()
+        result.close()
+
+        if user:
+            result = db.session.execute('SELECT * FROM Friend WHERE userId=:userId', {'userId': user_id})
+            friends = []
+            for friend in result:
+                friends.append(friend.name)
+
+            return create_response(data={'friends': friends})
+        else:
+            return create_response(status=404, message="User does not exist")
+    
+    # We're in the POST flow. User wants to create a friend
+    body = request.get_json()
+    if not body:
+        return create_response(status=400, message="Not JSON")
+
+    user_id = body.get('userId')
+    name = body.get('name')
+
+    if not user_id or not name:
+        return create_response(status=400)
+
+    result = db.session.execute('INSERT INTO Friend (userId, name) VALUES (:userId, :name)', {'userId': user_id, 'name': name})
+    db.session.commit()
+    return create_response(message="Successfully created friend")
 
 
 @main.route('/friends/<id>', methods=['PUT', 'DELETE'])
 def friend(id):
-    return Response(status=200)
+    if request.method == 'DELETE':
+        # Check if friend exists
+        result = db.session.execute('SELECT * FROM Friend WHERE friendId=:id', {'id': id})
+        friend = result.fetchone()
+
+        if not friend:
+            return create_response(status=404, message="Friend not found")
+
+        try:
+            result = db.session.execute('DELETE FROM Friend WHERE friendId=:id', {'id': id})
+            db.session.commit()
+            return create_response(status=200, message="Friend successfully deleted")
+        except Exception as e:
+            return create_response(status=500, message="Something went wrong...")
+
+    # We're in the PUT flow. User wants to edit the friend
+    body = request.get_json()
+    if not body:
+        return create_response(status=400, message="Not JSON")
+
+    name = body.get('name')
+
+    if not name:
+        return create_response(status=400, message="Name field needs to be supplied")
+
+    result = db.session.execute('UPDATE Friend SET name=:name WHERE friendId=:id', {'name': name, 'id': id})
+    db.session.commit()
+    return create_response(status=200)
 
 
 @main.route('/sentiments', methods=['POST'])

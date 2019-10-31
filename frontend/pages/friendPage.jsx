@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Head } from "../components";
 import {
   Button,
   Row,
@@ -17,6 +18,8 @@ import {
 import { getFriends } from "../utils/ApiWrapper";
 import { withRouter } from "next/router";
 
+import "../static/style.scss";
+
 class FriendPage extends Component {
   constructor(props) {
     super(props);
@@ -32,7 +35,7 @@ class FriendPage extends Component {
   }
 
   getFriendsWrapper = async id => {
-    let friends = getFriends(id);
+    let friends = await getFriends(id);
     this.setState({
       friends
     });
@@ -67,6 +70,7 @@ class FriendPage extends Component {
   render() {
     return (
       <div className="app">
+        <Head />
         <h1 align="center">Your Friends</h1>
         <Modal isOpen={this.state.modalOpen}>
           <ModalBody>
