@@ -86,10 +86,29 @@ export const changeFriendName = (friendId, friend) =>
       return error.response;
     });
 
-export const getSentiments = id => [
-  { id: id, sentiment: "happy" },
-  { id: id, sentiment: "sad" }
-];
+export const getSentiment = friendId =>
+  axios
+    .get(`${BACKEND_URL}/sentiments/${friendId}`)
+    .then(response => {
+      console.log(response);
+      return response.data.result;
+    })
+    .catch(error => {
+      console.log(error);
+      return error.response;
+    });
+
+export const updateSentiment = (friendId, sentiment) =>
+  axios
+    .put(`${BACKEND_URL}/sentiments/${friendId}`, sentiment)
+    .then(response => {
+      console.log(response);
+      return response;
+    })
+    .catch(error => {
+      console.log(error);
+      return error.response;
+    });
 
 export const editFriend = (id, name) => ({
   id: id,

@@ -36,11 +36,11 @@ class FriendPage extends Component {
   }
 
   getFriendsWrapper = async () => {
-    const { pid } = this.props.router.query;
+    const { userId } = this.props.router.query;
     this.setState({
-      userId: pid
+      userId
     });
-    let friends = await getFriends(pid);
+    let friends = await getFriends(userId);
     this.setState({
       friends
     });
