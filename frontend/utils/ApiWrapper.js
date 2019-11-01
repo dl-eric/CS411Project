@@ -86,7 +86,7 @@ export const changeFriendName = (friendId, friend) =>
       return error.response;
     });
 
-export const deleteFriend = (friendId) =>
+export const deleteFriend = friendId =>
   axios
     .delete(`${BACKEND_URL}/friends/${friendId}`)
     .then(response => {
@@ -97,7 +97,7 @@ export const deleteFriend = (friendId) =>
       console.log(error);
       return error.response;
     });
-  
+
 export const getSentiment = friendId =>
   axios
     .get(`${BACKEND_URL}/sentiments/${friendId}`)
@@ -112,15 +112,15 @@ export const getSentiment = friendId =>
 
 export const addSentiment = (friendId, sentiment) =>
   axios
-  .post(`${BACKEND_URL}/sentiments/${friendId}`, sentiment)
-  .then(response => {
-    console.log(response);
-    return response;
-  })
-  .catch(error => {
-    console.log(error);
-    return error.response;
-  });
+    .post(`${BACKEND_URL}/sentiments/${friendId}`, sentiment)
+    .then(response => {
+      console.log(response);
+      return response;
+    })
+    .catch(error => {
+      console.log(error);
+      return error.response;
+    });
 
 export const updateSentiment = (friendId, sentiment) =>
   axios
@@ -133,4 +133,3 @@ export const updateSentiment = (friendId, sentiment) =>
       console.log(error);
       return error.response;
     });
-

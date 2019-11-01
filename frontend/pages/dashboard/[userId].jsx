@@ -71,10 +71,10 @@ class FriendPage extends Component {
     await this.getFriendsWrapper();
   };
 
-  removeFriend = async (friendId) => {
-    await deleteFriend(friendId)
-    await this.getFriendsWrapper()
-  }
+  removeFriend = async friendId => {
+    await deleteFriend(friendId);
+    await this.getFriendsWrapper();
+  };
 
   handleChange = e => {
     this.setState({
@@ -138,7 +138,9 @@ class FriendPage extends Component {
                     </Button>
                     <Button
                       className="detail-btn"
-                      onClick={() => {this.removeFriend(friend.friendId)}}
+                      onClick={() => {
+                        this.removeFriend(friend.friendId);
+                      }}
                     >
                       Delete
                     </Button>
