@@ -16,7 +16,7 @@ import {
   Label,
   CardFooter
 } from "reactstrap";
-import { getFriends, addFriend } from "../../utils/ApiWrapper";
+import { getFriends, addFriend, deleteFriend } from "../../utils/ApiWrapper";
 import Router, { withRouter } from "next/router";
 
 import "../../static/style.scss";
@@ -36,11 +36,11 @@ class FriendPage extends Component {
   }
 
   getFriendsWrapper = async () => {
-    const { pid } = this.props.router.query;
+    const { userId } = this.props.router.query;
     this.setState({
-      userId: pid
+      userId
     });
-    let friends = await getFriends(pid);
+    let friends = await getFriends(userId);
     this.setState({
       friends
     });
@@ -59,14 +59,20 @@ class FriendPage extends Component {
   };
 
   createFriend = async () => {
-    let newFriend = {
+    const newFriend = {
       name: this.state.newFriend,
       userId: this.state.userId
     };
+
     await addFriend(newFriend);
     this.setState({
       modalOpen: false
     });
+    await this.getFriendsWrapper();
+  };
+
+  removeFriend = async friendId => {
+    await deleteFriend(friendId);
     await this.getFriendsWrapper();
   };
 
@@ -129,6 +135,14 @@ class FriendPage extends Component {
                       onClick={() => Router.push(`/friend/${friend.friendId}`)}
                     >
                       Details
+                    </Button>
+                    <Button
+                      className="detail-btn"
+                      onClick={() => {
+                        this.removeFriend(friend.friendId);
+                      }}
+                    >
+                      Delete
                     </Button>
                   </CardFooter>
                 </Card>

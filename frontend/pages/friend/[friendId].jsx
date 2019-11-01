@@ -3,40 +3,49 @@ import { Head } from "../../components";
 import { Button, Container, Input } from "reactstrap";
 import Dropzone from "react-dropzone";
 import { withRouter } from "next/router";
-import { getFriend, changeFriendName } from "../../utils/ApiWrapper";
+import {
+  getFriend,
+  changeFriendName,
+  getSentiment,
+  updateSentiment
+} from "../../utils/ApiWrapper";
+import "../../static/style.scss";
 
 class FriendDetailPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
       friend: {},
+      friendId: "",
+      sentiment: {},
       isEditingName: false,
-      sentiment: "Happy",
-      files: "File1"
+      newFile: ""
     };
   }
 
   async componentDidMount() {
-    await this.getFriendWrapper();
+    await this.getDataWrapper();
   }
 
-  getFriendWrapper = async () => {
+  getDataWrapper = async () => {
     const { friendId } = this.props.router.query;
-    console.log(friendId);
     this.setState({
       friendId
     });
-    let friend = await getFriend(friendId);
-    console.log(friend);
+    const friend = await getFriend(friendId);
+    const sentiment = await getSentiment(friendId);
     this.setState({
-      friend
+      friend,
+      sentiment
     });
   };
 
-  onDrop = files => {
-    this.setState({
-      sentiment: files[0].name
-    });
+  onDrop = async files => {
+    const newSentiment = {
+      filename: files[0].name
+    };
+    await updateSentiment(this.state.friendId, newSentiment);
+    await this.getDataWrapper();
   };
 
   handleChange = e => {
@@ -56,7 +65,7 @@ class FriendDetailPage extends Component {
       name: this.state.newName
     };
     await changeFriendName(this.state.friend.friendId, newFriend);
-    await this.getFriendWrapper();
+    await this.getDataWrapper();
     this.cancelEditName();
   };
 
@@ -72,7 +81,11 @@ class FriendDetailPage extends Component {
         <Container fluid>
           <Head />
           <h1 align="center">{this.state.friend.name}</h1>
-          <Button color="primary" onClick={this.editName}>
+          <Button
+            className="action-btn"
+            color="primary"
+            onClick={this.editName}
+          >
             Edit Name
           </Button>
           {this.state.isEditingName && (
@@ -86,8 +99,7 @@ class FriendDetailPage extends Component {
               <Button onClick={this.cancelEditName}>Cancel</Button>
             </>
           )}
-          <h4>Sentiment: {this.state.sentiment}</h4>
-          <h4>Files: {this.state.files}</h4>
+          <h4>File: {this.state.sentiment.fileName}</h4>
           <h4>Upload File</h4>
           <Dropzone onDrop={this.onDrop}>
             {({ getRootProps, getInputProps }) => (
