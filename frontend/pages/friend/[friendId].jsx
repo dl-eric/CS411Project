@@ -9,7 +9,7 @@ import {
   getSentiment,
   updateSentiment
 } from "../../utils/ApiWrapper";
-import "../../static/style.scss";
+import "../../public/style.scss";
 
 class FriendDetailPage extends Component {
   constructor(props) {
@@ -79,7 +79,7 @@ class FriendDetailPage extends Component {
     return (
       <div className="app">
         <Container fluid>
-          <Head />
+          <Head title={this.state.friend.name} />
           <h1 align="center">{this.state.friend.name}</h1>
           <Button
             className="action-btn"
