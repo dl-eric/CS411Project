@@ -86,6 +86,18 @@ export const changeFriendName = (friendId, friend) =>
       return error.response;
     });
 
+export const deleteFriend = (friendId) =>
+  axios
+    .delete(`${BACKEND_URL}/friends/${friendId}`)
+    .then(response => {
+      console.log(response);
+      return response;
+    })
+    .catch(error => {
+      console.log(error);
+      return error.response;
+    });
+  
 export const getSentiment = friendId =>
   axios
     .get(`${BACKEND_URL}/sentiments/${friendId}`)
@@ -97,6 +109,18 @@ export const getSentiment = friendId =>
       console.log(error);
       return error.response;
     });
+
+export const addSentiment = (friendId, sentiment) =>
+  axios
+  .post(`${BACKEND_URL}/sentiments/${friendId}`, sentiment)
+  .then(response => {
+    console.log(response);
+    return response;
+  })
+  .catch(error => {
+    console.log(error);
+    return error.response;
+  });
 
 export const updateSentiment = (friendId, sentiment) =>
   axios
@@ -110,17 +134,3 @@ export const updateSentiment = (friendId, sentiment) =>
       return error.response;
     });
 
-export const editFriend = (id, name) => ({
-  id: id,
-  name: name
-});
-
-export const addSentiment = (id, sentiment) => ({
-  id: id,
-  sentiment: sentiment
-});
-
-export const deleteSentiment = (id, sentiment) =>
-  [{ id: id, sentiment: "happy" }, { id: id, sentiment: "sad" }].filter(
-    entry => entry.id !== id && entry.sentiment !== sentiment
-  );

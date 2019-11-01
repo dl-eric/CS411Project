@@ -16,7 +16,7 @@ import {
   Label,
   CardFooter
 } from "reactstrap";
-import { getFriends, addFriend } from "../../utils/ApiWrapper";
+import { getFriends, addFriend, deleteFriend } from "../../utils/ApiWrapper";
 import Router, { withRouter } from "next/router";
 
 import "../../static/style.scss";
@@ -59,16 +59,22 @@ class FriendPage extends Component {
   };
 
   createFriend = async () => {
-    let newFriend = {
+    const newFriend = {
       name: this.state.newFriend,
       userId: this.state.userId
     };
+
     await addFriend(newFriend);
     this.setState({
       modalOpen: false
     });
     await this.getFriendsWrapper();
   };
+
+  removeFriend = async (friendId) => {
+    await deleteFriend(friendId)
+    await this.getFriendsWrapper()
+  }
 
   handleChange = e => {
     this.setState({
@@ -129,6 +135,12 @@ class FriendPage extends Component {
                       onClick={() => Router.push(`/friend/${friend.friendId}`)}
                     >
                       Details
+                    </Button>
+                    <Button
+                      className="detail-btn"
+                      onClick={() => {this.removeFriend(friend.friendId)}}
+                    >
+                      Delete
                     </Button>
                   </CardFooter>
                 </Card>
