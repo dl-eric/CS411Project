@@ -9,7 +9,7 @@ import {
   getSentiment,
   updateSentiment
 } from "../../utils/ApiWrapper";
-import "../../static/style.scss";
+import "../../public/style.scss";
 
 class FriendDetailPage extends Component {
   constructor(props) {
