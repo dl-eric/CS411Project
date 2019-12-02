@@ -83,6 +83,17 @@ def create_app(test_config=None):
     # why blueprints http://flask.pocoo.org/docs/1.0/blueprints/
     app.register_blueprint(main.main)
 
+    from api_mongo.models import db as db_mongo
+
+    db_mongo.init_app(app)  # initialize Flask MongoEngine with this flask app
+    Migrate(app, db_mongo)
+
+    # import and register blueprints
+    from api_mongo.views import main_mongo
+
+    # why blueprints http://flask.pocoo.org/docs/1.0/blueprints/
+    app.register_blueprint(main_mongo.main_mongo)
+
     # register error Handler
     app.register_error_handler(Exception, all_exception_handler)
 
