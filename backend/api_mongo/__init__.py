@@ -4,12 +4,10 @@ import logging
 from flask import Flask, request
 from flask_cors import CORS
 from flask_migrate import Migrate
-from sqlalchemy_utils import create_database, database_exists
 from flask_mongoengine import MongoEngine
 
-
-from api.config import config
-from api.core import all_exception_handler
+from api_mongo.config import config
+from api_mongo.core import all_exception_handler
 
 
 class RequestFormatter(logging.Formatter):
@@ -30,6 +28,7 @@ def create_app(test_config=None):
     if __main__ == "__name__":
         app.run()
     """
+
     app = Flask(__name__)
 
     CORS(app)  # add CORS
@@ -68,29 +67,23 @@ def create_app(test_config=None):
     root.addHandler(strm)
 
     # decide whether to create database
-    if env != "prod":
-        db_url = app.config["SQLALCHEMY_DATABASE_URI"]
-        if not database_exists(db_url):
-            create_database(db_url)
+    # if env != "prod":
+    #     db_url = app.config["SQLALCHEMY_DATABASE_URI"]
+    #     if not database_exists(db_url):
+    #         create_database(db_url)
 
-    app.config["MONGODB_SETTINGS"] = {"host": os.environ.get("MONGO_URL")}
+    app.config["MONGO_URI"] = os.environ.get("MONGO_URL")
+    # app.config["MONGODB_SETTINGS"] = {
+    #     "db": "communityconnect-labs",
+    #     "host": "127.0.0.1",
+    #     "port": 27017,
+    # }
 
-    # register sqlalchemy to this app
-    from api.models import db
+    # register mongoengine to this app
+    from api_mongo.models import db
 
-    db.init_app(app)  # initialize Flask SQLALchemy with this flask app
+    db.init_app(app)  # initialize Flask MongoEngine with this flask app
     Migrate(app, db)
-
-    # import and register blueprints
-    from api.views import main
-
-    # why blueprints http://flask.pocoo.org/docs/1.0/blueprints/
-    app.register_blueprint(main.main)
-
-    from api_mongo.models import db as db_mongo
-
-    db_mongo.init_app(app)  # initialize Flask MongoEngine with this flask app
-    Migrate(app, db_mongo)
 
     # import and register blueprints
     from api_mongo.views import main_mongo
