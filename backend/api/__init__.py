@@ -5,7 +5,6 @@ from flask import Flask, request
 from flask_cors import CORS
 from flask_migrate import Migrate
 from sqlalchemy_utils import create_database, database_exists
-from flask_pymongo import PyMongo
 from flask_mongoengine import MongoEngine
 
 
@@ -74,17 +73,7 @@ def create_app(test_config=None):
         if not database_exists(db_url):
             create_database(db_url)
 
-    # app.config["MONGO_URI"] = os.environ.get("MONGO_URL")
-
-    mongo = MongoEngine()
-
-    app.config["MONGODB_DB"] = os.environ.get("MONGODB_DB")
-    app.config["MONGODB_HOST"] = os.environ.get("MONGODB_HOST")
-    app.config["MONGODB_PORT"] = int(os.environ.get("MONGODB_PORT"))
-    app.config["MONGODB_USERNAME"] = os.environ.get("MONGODB_USERNAME")
-    app.config["MONGODB_PASSWORD"] = os.environ.get("MONGODB_PASSWORD")
-
-    mongo.init_app(app)
+    app.config["MONGODB_SETTINGS"] = {"host": os.environ.get("MONGO_URL")}
 
     # register sqlalchemy to this app
     from api.models import db

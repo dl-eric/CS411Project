@@ -20,23 +20,20 @@ def get_persons():
 # POST request for /persons
 @main_mongo.route("/persons", methods=["POST"])
 def create_person():
-    data = request.get_json()
+    data = request.form
 
     logger.info("Data recieved: %s", data)
     if "name" not in data:
         msg = "No name provided for person."
         logger.info(msg)
         return create_response(status=422, message=msg)
-    if "emails" not in data:
+    if "email" not in data:
         msg = "No email provided for person."
         logger.info(msg)
         return create_response(status=422, message=msg)
 
     #  create MongoEngine objects
-    new_person = Person(name=data["name"])
-    for email in data["emails"]:
-        email_obj = Email(email=email)
-        new_person.emails.append(email_obj)
+    new_person = Person(name=data["name"], email=data["email"])
     new_person.save()
 
     return create_response(

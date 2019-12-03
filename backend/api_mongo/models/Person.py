@@ -9,7 +9,7 @@ class Person(Document, Mixin):
     """Person Collection."""
 
     name = StringField(required=True)
-    emails = ListField(EmbeddedDocumentField(Email))
+    email = StringField(required=True)
 
     # def __init__(self, name: str):
     #     self.name = name
