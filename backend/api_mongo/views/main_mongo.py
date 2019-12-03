@@ -4,14 +4,10 @@ from api_mongo.core import create_response, serialize_list, logger
 
 main_mongo = Blueprint("main_mongo", __name__)  # initialize blueprint
 
-# function that is called when you visit /
-@main_mongo.route("/")
-def index():
-    # you are now in the current application context with the main.route decorator
-    # access the logger with the logger from api.core and uses the standard logging module
-    # try using ipdb here :) you can inject yourself
-    logger.info("Hello World!")
-    return "Hello World!"
+
+@main_mongo.route("/test", methods=["GET"])
+def test():
+    return create_response(data={"items": ["hello", "world"]})
 
 
 # function that is called when you visit /persons
