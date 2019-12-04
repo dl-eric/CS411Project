@@ -192,6 +192,16 @@ def sentiments():
     return create_response(status=200, message="Successfully created sentiment")
 
 
+@main.route("/messagecount/<id>", methods=["PUT", "GET"])
+def get_message_count(id):
+    result = db.session.execute(
+        "SELECT SUM(totalMessages) as A FROM User U JOIN Friend Fr on U.userId=Fr.userId JOIN File Fi on Fr.friendId=Fi.friendId WHERE U.userId=(:id) GROUP BY Fr.friendId",
+        {"id": id},
+    )
+
+    return create_response(data={"result": [dict(row) for row in result]})
+
+
 @main.route("/sentiments/<id>", methods=["PUT", "GET"])
 def get_sentiment(id):
     if request.method == "PUT":
