@@ -10,8 +10,8 @@ import {
   getSentiment,
   sendFile
 } from "../../utils/ApiWrapper";
+import BarChart from "react-bar-chart";
 import "../../public/style.scss";
-import Wordcloud from "react-wordcloud";
 
 class FriendDetailPage extends Component {
   constructor(props) {
@@ -23,7 +23,8 @@ class FriendDetailPage extends Component {
       isEditingName: false,
       counts: null,
       pos: null,
-      neg: null
+      neg: null,
+      reacts: null
     };
   }
 
@@ -92,7 +93,7 @@ class FriendDetailPage extends Component {
       this.state.friendId
     );
     let counts = {};
-    const { pos, neg } = response;
+    const { pos, neg, reacts } = response;
     Object.keys(response.counts).forEach(person => {
       counts[person] = Object.keys(response.counts[person]).map(word => ({
         text: word,
@@ -102,11 +103,19 @@ class FriendDetailPage extends Component {
     this.setState({
       counts,
       pos,
-      neg
+      neg,
+      reacts
     });
   };
 
   render() {
+    const data = this.state.reacts
+      ? this.state.reacts.emoji.map((emoji, index) => ({
+          y: this.state.reacts.count[index],
+          emoji
+        }))
+      : null;
+
     return (
       <div className="app">
         <Container fluid>
@@ -147,6 +156,7 @@ class FriendDetailPage extends Component {
               </section>
             )}
           </Dropzone>
+          {this.state.reacts && <BarChart ylabel="Quantity" data={data} />}
           <Button onClick={this.getFriendSentiment}>getFriendSentiment</Button>
           {this.state.counts &&
             Object.keys(this.state.counts).map(person => (

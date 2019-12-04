@@ -374,8 +374,11 @@ def get_sentiments():
     userId = str(userId)
     friendId = str(friendId)
 
-    frequent_reacts(userId, friendId)
+    reacts = frequent_reacts(userId, friendId)
 
     counts = word_cloud(userId, friendId)
 
-    return create_response(data={"counts": counts, "neg": neg, "pos": pos})
+    return create_response(
+        data={"reacts": reacts, "counts": counts, "neg": neg, "pos": pos}
+    )
+
