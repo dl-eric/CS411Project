@@ -21,7 +21,9 @@ class FriendDetailPage extends Component {
       friendId: "",
       fileTimes: [],
       isEditingName: false,
-      counts: null
+      counts: null,
+      pos: null,
+      neg: null
     };
   }
 
@@ -89,19 +91,21 @@ class FriendDetailPage extends Component {
       this.state.friend.userId,
       this.state.friendId
     );
-    console.log(response);
     let counts = {};
+    const { pos, neg } = response;
     Object.keys(response.counts).forEach(person => {
       counts[person] = Object.keys(response.counts[person])
         .map(word => ({
           text: word,
           value: response.counts[person][word]
         }))
-        .sort((left, right) => left.value < right.value)
-        .slice(0, 100);
+        .sort((left, right) => right.value - left.value);
     });
+    console.log(counts);
     this.setState({
-      counts
+      counts,
+      pos,
+      neg
     });
   };
 
@@ -150,8 +154,19 @@ class FriendDetailPage extends Component {
           {this.state.counts &&
             Object.keys(this.state.counts).map(person => (
               <>
-                <h4>{person}</h4>
-                <ReactWordcloud words={this.state.counts[person]} />
+                <h3>{person}</h3>
+                <h3>Positive</h3>
+                <ReactWordcloud
+                  words={this.state.counts[person].filter(word =>
+                    this.state.pos.includes(word.text)
+                  )}
+                />
+                <h3>Negative</h3>
+                <ReactWordcloud
+                  words={this.state.counts[person].filter(word =>
+                    this.state.neg.includes(word.text)
+                  )}
+                />
               </>
             ))}
         </Container>
