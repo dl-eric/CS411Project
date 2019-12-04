@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Head } from "../../components";
 import { Button, Container, Input } from "reactstrap";
 import Dropzone from "react-dropzone";
-import { withRouter } from "next/router";
+import Router, { withRouter } from "next/router";
 import ReactWordcloud from "react-wordcloud";
 import {
   getFriend,
@@ -41,10 +41,13 @@ class FriendDetailPage extends Component {
     this.setState({
       friend
     });
-    const timestamps = await getFiles(this.state.friend.userId, this.state.friendId)
+    const timestamps = await getFiles(
+      this.state.friend.userId,
+      this.state.friendId
+    );
     this.setState({
       fileTimes: timestamps
-    })
+    });
     const response = await getSentiment(
       this.state.friend.userId,
       this.state.friendId
@@ -56,7 +59,7 @@ class FriendDetailPage extends Component {
   };
 
   onDrop = async files => {
-    let timestamps = this.state.fileTimes
+    let timestamps = this.state.fileTimes;
     for (let file of files) {
       const res = await sendFile(
         file,
@@ -131,6 +134,15 @@ class FriendDetailPage extends Component {
               <Button color='danger' className='edit-name-btn' onClick={this.cancelEditName}>Cancel</Button>
             </div>
           )}
+          <Button
+            className="logout-btn"
+            color="danger"
+            onClick={() =>
+              Router.push(`/dashboard/${this.state.friend.userId}`)
+            }
+          >
+            Back
+          </Button>
           <h4>Uploaded Files:</h4>
           <ul>
             {this.state.fileTimes.map(fileTime => (
@@ -152,14 +164,16 @@ class FriendDetailPage extends Component {
           {this.state.counts &&
             Object.keys(this.state.counts).map(person => (
               <>
-                <Button className='sentiment-btn'
+                <Button
+                  className="sentiment-btn"
                   onClick={() =>
                     this.setState({ person, sentiment: "Positive" })
                   }
                 >
                   {person} - Positive
                 </Button>
-                <Button className='sentiment-btn'
+                <Button
+                  className="sentiment-btn"
                   onClick={() =>
                     this.setState({ person, sentiment: "Negative" })
                   }
@@ -176,7 +190,7 @@ class FriendDetailPage extends Component {
                   <ReactWordcloud
                     words={
                       this.state.counts[this.state.person][
-                        this.state.sentiment === "Positive" ? "pos" : "neg"
+                      this.state.sentiment === "Positive" ? "pos" : "neg"
                       ]
                     }
                   />
