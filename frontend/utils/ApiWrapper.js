@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BACKEND_URL = "http://52.240.158.249:5000";
+const BACKEND_URL = "http://localhost:5000";
 
 export const helloWorld = () =>
   axios
@@ -174,7 +174,7 @@ export const getFiles = (userId, friendId) =>
     .get(`${BACKEND_URL}/messages/${userId}/${friendId}`)
     .then(response => {
       console.log(response);
-      return response.data.result;
+      return response.data.result.files;
     })
     .catch(error => {
       console.log(error);
@@ -186,7 +186,7 @@ export const getTimeStamp = fileId =>
     .get(`${BACKEND_URL}/file/${fileId}`)
     .then(response => {
       console.log(response);
-      return response.data.result;
+      return response.data.result.timestamp;
     })
     .catch(error => {
       console.log(error);

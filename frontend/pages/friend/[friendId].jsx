@@ -3,7 +3,6 @@ import { Head } from "../../components";
 import { Button, Container, Input } from "reactstrap";
 import Dropzone from "react-dropzone";
 import { withRouter } from "next/router";
-// import Unzipper from "unzipper";
 import {
   getFriend,
   changeFriendName,
@@ -40,9 +39,9 @@ class FriendDetailPage extends Component {
     });
     const fileIds = await getFiles(this.state.friend.userId, this.state.friendId)
     let timestamps = []
-    for (const fileId of fileIds.files) {
+    for (const fileId of fileIds) {
       const timestamp = await getTimeStamp(fileId)
-      timestamps.push(timestamp.timestamp)
+      timestamps.push(timestamp)
     }
     this.setState({
       fileTimes: timestamps
@@ -91,12 +90,6 @@ class FriendDetailPage extends Component {
     this.setState({
       isEditingName: false
     });
-  };
-
-  getFriendSentiment = async () => {
-    const response = await getSentiment(this.state.userId, this.state.friendId);
-    const dir = await Unzipper.Open.buffer(response);
-    console.log(dir);
   };
 
   render() {
