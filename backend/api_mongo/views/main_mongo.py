@@ -13,17 +13,19 @@ def test():
 
 @main_mongo.route("/messages", methods=["GET"])
 def get_messages():
-    user_id = request.args.get('user_id')
+    userId = request.args.get("userId")
 
-    if not user_id:
-        return create_response(status=400, message="Must specify user_id")
+    if not userId:
+        return create_response(status=400, message="Must specify userId")
 
-    #messages = Message.objects(user_id=user_id)
-    messages = list(db.message.find({'user_id': user_id}, {'_id': 0}))
+    # messages = Message.objects(userId=userId)
+    messages = list(db.message.find({"userId": userId}, {"_id": 0}))
 
-    # Check if user_id exists in db
+    # Check if userId exists in db
     if len(messages) == 0:
-        return create_response(status=404, message="Messages of specified user id not found")
+        return create_response(
+            status=404, message="Messages of specified user id not found"
+        )
 
     return create_response(data={"messages": messages})
 
@@ -34,13 +36,13 @@ def create_messages():
     logger.info("Data recieved: %s", data)
     f = request.files.get("file")
 
-    file_data = json.load(f)['messages']
-    
+    file_data = json.load(f)["messages"]
+
     for message in file_data:
-        message['file_id'] = data['file_id']
-        message['user_id'] = data['user_id']
-        message['friend_id'] = data['friend_id']
- 
+        message["fileId"] = data["fileId"]
+        message["userId"] = data["userId"]
+        message["friendId"] = data["friendId"]
+
     db.message.insert_many(file_data)
 
     return create_response(message=f"Successfully created new message")
@@ -70,7 +72,7 @@ def create_person():
         return create_response(status=422, message=msg)
 
     #  create MongoEngine objects
-    db.person.insert_one({'name': data['name'], 'email': data['email']})
+    db.person.insert_one({"name": data["name"], "email": data["email"]})
 
     return create_response(
         message=f"Successfully created person {data['name']} with id: {data['email']}"
