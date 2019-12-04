@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Head } from "../components";
-import { Button, Form, FormGroup, Input, Container } from "reactstrap";
+import { Button, Form, FormGroup, Input, Container, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 
 import Router from "next/router";
 
@@ -17,13 +17,19 @@ export default class Login extends Component {
     this.state = {
       username: "",
       password: "",
-      errorMessage: ""
+      confirmPassword: "",
+      errorMessage: "",
+      modal: false
     };
+    this.toggle = this.toggle.bind(this)
+    this.handleKeyPress = this.handleKeyPress.bind(this)
   }
 
   updateUsername = event => this.setState({ username: event.target.value });
 
   updatePassword = event => this.setState({ password: event.target.value });
+
+  updateConfirmPassword = event => this.setState({ confirmPassword: event.target.value });
 
   handleLogin = async () => {
     this.setState({ errorMessage: "" });
@@ -52,8 +58,13 @@ export default class Login extends Component {
     }
   };
 
-  handlesignUp = async () => {
+  handleSignUp = async () => {
     this.setState({ errorMessage: "" });
+
+    if (this.state.password !== this.state.confirmPassword) {
+      this.setState({ errorMessage: "Passwords do not match" })
+      return;
+    }
 
     const signUpResponse = await signUp(
       this.state.username,
@@ -79,16 +90,66 @@ export default class Login extends Component {
     }
   };
 
+  handleKeyPress = event => {
+    if (event.key == "Enter") {
+      this.state.modal ? this.handleSignUp() : this.handleLogin();
+    }
+  }
+
+  toggle() {
+    this.setState({ modal: !this.state.modal })
+  }
+
   /**
    * Renders the component.
    */
   render() {
     return (
-      <div className="App">
+      <div className="App" onKeyPress={this.handleKeyPress}>
         <Container fluid className="login-container">
           <Head />
           <h1 align="center">Login</h1>
-          <Form>
+          <Modal isOpen={this.state.modal}>
+            <ModalHeader>Sign up</ModalHeader>
+            <ModalBody>
+              <Form onSubmit={this.handleSignUp}>
+                <FormGroup>
+                  <Input placeholder="username" onChange={this.updateUsername} />
+                </FormGroup>
+                <FormGroup>
+                  <Input
+                    type="password"
+                    placeholder="password"
+                    onChange={this.updatePassword}
+                  />
+                </FormGroup>
+                <FormGroup>
+                  <Input
+                    type="password"
+                    placeholder="confirm password"
+                    onChange={this.updateConfirmPassword}
+                  />
+                </FormGroup>
+              </Form>
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                color="primary"
+                className="login-btn"
+                onClick={this.handleSignUp}
+              >
+                Submit
+            </Button>
+              <Button
+                className="login-btn"
+                onClick={this.toggle}
+              >
+                Close
+            </Button>
+              {this.state.errorMessage && <><p>{this.state.errorMessage}</p></>}
+            </ModalFooter>
+          </Modal>
+          <Form onSubmit={this.handleLogin}>
             <FormGroup>
               <Input placeholder="username" onChange={this.updateUsername} />
             </FormGroup>
@@ -99,24 +160,25 @@ export default class Login extends Component {
                 onChange={this.updatePassword}
               />
             </FormGroup>
-            <Button
-              color="success"
-              className="login-btn"
-              onClick={this.handleLogin}
-            >
-              Log in
-            </Button>
-            <Button
-              color="primary"
-              className="login-btn"
-              onClick={this.handlesignUp}
-            >
-              Sign up
-            </Button>
-            <p>{this.state.errorMessage}</p>
+
           </Form>
+          <Button
+            color="success"
+            className="login-btn"
+            onClick={this.handleLogin}
+          >
+            Log in
+            </Button>
+          <Button
+            color="primary"
+            className="login-btn"
+            onClick={this.toggle}
+          >
+            Sign up
+            </Button>
+          <p>{this.state.errorMessage}</p>
         </Container>
-      </div>
+      </div >
     );
   }
 }
