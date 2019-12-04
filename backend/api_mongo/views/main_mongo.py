@@ -238,7 +238,9 @@ def frequent_reacts(userId, friendId):
                 count.append(v)
 
     print(emojis, count)
-    return bar_plot_generator("Frequent Reacts", emojis, count)
+    return bar_plot_generator(
+        userId + "_" + friendId + "_Frequent Reacts", emojis, count
+    )
 
 
 # sentiment analysis
@@ -283,7 +285,9 @@ def word_cloud(userId, friendId):
 
     for m_arr in messages:
         message = " ".join(m_arr["content"])
-        word_cloud_generator(str(userId) + str(friendId) + m_arr["_id"], message)
+        word_cloud_generator(
+            str(userId) + "_" + str(friendId) + "_" + m_arr["_id"], message
+        )
 
 
 def find_messages_between(userId, friendId):
@@ -406,9 +410,5 @@ def get_sentiments():
 
     # send_from
 
-    zipf = zipfile.ZipFile("files.zip", "w", zipfile.ZIP_DEFLATED)
-    zipdir("files/", zipf)
-    zipf.close()
-
-    return send_file("../files.zip")
+    return create_response(message="Success")
 
