@@ -3,6 +3,7 @@ import { Head } from "../../components";
 import { Button, Container, Input } from "reactstrap";
 import Dropzone from "react-dropzone";
 import { withRouter } from "next/router";
+// import Unzipper from "unzipper";
 import {
   getFriend,
   changeFriendName,
@@ -20,7 +21,7 @@ class FriendDetailPage extends Component {
       friend: {},
       friendId: "",
       fileTimes: [],
-      isEditingName: false,
+      isEditingName: false
     };
   }
 
@@ -51,13 +52,17 @@ class FriendDetailPage extends Component {
   onDrop = async files => {
     let timestamps = this.state.fileTimes
     for (let file of files) {
-      const res = await sendFile(file, this.state.friend.userId, this.state.friendId)
-      const timestamp = res.response.data.result.timestamp
-      timestamps.push(timestamp)
+      const res = await sendFile(
+        file,
+        this.state.friend.userId,
+        this.state.friendId
+      );
+      const timestamp = res.response.data.result.timestamp;
+      timestamps.push(timestamp);
     }
     this.setState({
       fileTimes: timestamps
-    })
+    });
     await this.getDataWrapper();
   };
 
@@ -86,6 +91,12 @@ class FriendDetailPage extends Component {
     this.setState({
       isEditingName: false
     });
+  };
+
+  getFriendSentiment = async () => {
+    const response = await getSentiment(this.state.userId, this.state.friendId);
+    const dir = await Unzipper.Open.buffer(response);
+    console.log(dir);
   };
 
   render() {
@@ -129,6 +140,7 @@ class FriendDetailPage extends Component {
               </section>
             )}
           </Dropzone>
+          <Button onClick={this.getFriendSentiment}>getFriendSentiment</Button>
         </Container>
       </div>
     );

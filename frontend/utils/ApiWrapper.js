@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BACKEND_URL = "http://localhost:5000";
+const BACKEND_URL = "http://52.240.158.249:5000";
 
 export const helloWorld = () =>
   axios
@@ -98,9 +98,9 @@ export const deleteFriend = friendId =>
       return error.response;
     });
 
-export const getSentiment = friendId =>
+export const getSentiment = (userId, friendId) =>
   axios
-    .get(`${BACKEND_URL}/sentiments/${friendId}`)
+    .get(`${BACKEND_URL}/sentiments?userId=${userId}&friendId=${friendId}`)
     .then(response => {
       console.log(response);
       return response.data.result;
