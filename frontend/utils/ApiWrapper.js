@@ -155,18 +155,15 @@ export const sendFile = (file, userId, friendId) => {
 
   return axios
     .post(`${BACKEND_URL}/messages`, data)
-    .then(response => {
-      return {
-        type: "UPLOAD_FILE_SUCCESS",
-        response
-      };
-    })
-    .catch(error => {
-      return {
-        type: "UPLOAD_FILE_FAIL",
-        error
-      };
-    });
+    .then(response => ({
+      type: "UPLOAD_FILE_SUCCESS",
+      response
+    }))
+
+    .catch(error => ({
+      type: "UPLOAD_FILE_FAIL",
+      error
+    }));
 };
 
 export const getFiles = (userId, friendId) =>
