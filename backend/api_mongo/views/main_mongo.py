@@ -22,8 +22,9 @@ with open("sentiment_dict.json") as template:
 
 neg = template_dct['negative']
 pos = template_dct['positive']
-neg_set = set(neg)
-pos_set = set(pos)
+both_set = Union(set(neg), set(pos))
+#neg_set = set(neg)
+#pos_set = set(pos)
 
 emoji_dict = {
     "ð\x9f\x98\x8d": "\U0001F60D",
@@ -36,21 +37,13 @@ emoji_dict = {
     "ð\x9f\x91\x8e": "\U0001F44E",
 }
 
-def sentiment_analysis_pos(s):
+def sentiment_analysis_both(s):
     l = Counter(s)
-    pos_dict = {k: v for k, v in l.items() if (k in pos_set)}
-    return pos_dict
-
-
-def sentiment_analysis_neg(s):
-    l = Counter(s)
-    neg_dict = {k: v for k, v in l.items() if (k in neg_set)}
-    return neg_dict
-
+    both_dict = {k: v for k, v in l.items() if (k in both_set)}
+    return both_dict
 
 def split_and_lower(s):
     return list(filter(lambda x: len(x) > 1, re.split("[^a-z']", s.lower())))
-
 
 # insert messages into db
 def insert_file(userId, friendId, fileid, filename):
@@ -221,6 +214,7 @@ def sentiment_analysis(userId, friendId):
                         {"userId": userId},
                         {"friendId": friendId},
                         {"word_count": {"$gt": 0}},
+                        {"type": "Generic"},
                     ]
                 }
             },
@@ -232,7 +226,7 @@ def sentiment_analysis(userId, friendId):
     ret = {}
 
     for message in messages:
-        ret[m_arr["_id"]] = {'pos': sentiment_analysis_pos(message["content"]), 'neg': sentiment_analysis_neg(message["content"])}
+        ret[m_arr["_id"]] = sentiment_analysis_both(message["content"])
 
     return ret
 
@@ -373,8 +367,8 @@ def get_sentiments():
     word_counts(userId, friendId)
     frequent_reacts(userId, friendId)
 
-    counts = word_cloud(userId, friendId)
-    sentiment_analysis(userId, friendId)
+    # counts = word_cloud(userId, friendId)
+    counts = sentiment_analysis(userId, friendId)
 
     # multi = MultipartEncoder(
     #     {"reactFile": (freq_react_file, open(freq_react_file), "text/plain")}
