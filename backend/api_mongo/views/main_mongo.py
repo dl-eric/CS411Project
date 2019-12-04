@@ -20,8 +20,8 @@ main_mongo = Blueprint("main_mongo", __name__)  # initialize blueprint
 with open("sentiment_dict.json") as template:
     template_dct = json.load(template)
 
-neg = template_dct['negative']
-pos = template_dct['positive']
+neg = template_dct["negative"]
+pos = template_dct["positive"]
 neg_set = set(neg)
 pos_set = set(pos)
 
@@ -35,6 +35,7 @@ emoji_dict = {
     "ð\x9f\x91\x8d": "\U0001F44D",
     "ð\x9f\x91\x8e": "\U0001F44E",
 }
+
 
 def sentiment_analysis_pos(s):
     l = Counter(s)
@@ -208,7 +209,7 @@ def frequent_reacts(userId, friendId):
                 count.append(v)
 
     print(emojis, count)
-    return {'emoji': emojis, 'count': count}
+    return {"emoji": emojis, "count": count}
 
 
 # sentiment analysis
@@ -235,6 +236,7 @@ def sentiment_analysis(userId, friendId):
         ret[message["_id"]] = {'pos': sentiment_analysis_pos(message["content"]), 'neg': sentiment_analysis_neg(message["content"])}
 
     return ret
+
 
 # word cloud
 def word_cloud(userId, friendId):
@@ -301,16 +303,18 @@ def get_messages():
 
     return create_response(data={"messages": messages})
 
-@main_mongo.route('/messages/<user_id>/<friend_id>')
-def get_files(user_id, friend_id):
-    logger.info('hi')
-    c = db.message.find({'userId': user_id, 'friendId': friend_id}, {'_id': 0, 'fileId': 1})
-    logger.info('hi2')
-    alice = set()
-    for a in c:
-        alice.add(a['fileId'])
 
-    return create_response(data={"files": list(alice)})
+@main_mongo.route("/messages/<user_id>/<friend_id>")
+def get_files(user_id, friend_id):
+    alice = set()
+    timestamps = sqldb.session.execute(
+        "SELECT timestamp FROM Friend Fr JOIN File Fi ON Fr.friendId=Fi.id WHERE Fr.friendId=:id", {'id': friend_id}
+    )
+
+    for timestamp in timestamps:
+        alice.add(timestamp.timestamp)
+
+    return create_response(data={'timestamps': list(alice)})
 
 @main_mongo.route("/messages", methods=["POST"])
 def create_messages():
@@ -318,7 +322,7 @@ def create_messages():
 
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     sqldb.session.execute(
-        "INSERT INTO File (timestamp) VALUES (:timestamp)", {"timestamp": timestamp}
+        "INSERT INTO File (timestamp, friendId) VALUES (:timestamp, :id)", {"timestamp": timestamp, 'id': data['friendId']}
     )
     sqldb.session.commit()
 
@@ -358,13 +362,6 @@ def create_messages():
     )
 
 
-def zipdir(path, ziph):
-    # ziph is zipfile handle
-    for root, dirs, files in os.walk(path):
-        for file in files:
-            ziph.write(os.path.join(root, file))
-
-
 @main_mongo.route("/sentiments", methods=["GET"])
 def get_sentiments():
     userId = request.args.get("userId")
@@ -379,19 +376,23 @@ def get_sentiments():
     userId = str(userId)
     friendId = str(friendId)
 
-    message_counts(userId, friendId)
-    word_counts(userId, friendId)
     frequent_reacts(userId, friendId)
 
     counts = word_cloud(userId, friendId)
-    sentiment_analysis(userId, friendId)
 
-    # multi = MultipartEncoder(
-    #     {"reactFile": (freq_react_file, open(freq_react_file), "text/plain")}
-    # )
+    countsOut = {}
+    for key in counts.keys():
+        countsOut[key] = {}
+        countsOut[key]["pos"] = [
+            {"text": key2, "value": counts[key][key2]}
+            for key2 in counts[key].keys()
+            if key2 in pos
+        ]
+        countsOut[key]["neg"] = [
+            {"text": key2, "value": counts[key][key2]}
+            for key2 in counts[key].keys()
+            if key2 in neg
+        ]
 
-    # Response(m.to_string(), mimetype=m.content_type)
+    return create_response(data={"counts": countsOut})
 
-    # send_from
-
-    return create_response(data={"counts": counts, "neg": neg, "pos": pos})
