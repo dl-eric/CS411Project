@@ -250,7 +250,8 @@ def sentiment_analysis(userId, friendId):
     )
 
     for message in messages:
-        sentiment_analysis_np(userId, friendId, message["_id"], message["content"])
+        print(sentiment_analysis_pos(message["content"]))
+        print(sentiment_analysis_neg(message["content"]))
 
 
 # word cloud
