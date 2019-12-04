@@ -329,8 +329,18 @@ def get_messages():
 @main_mongo.route("/messages", methods=["POST"])
 def create_messages():
     data = request.form
+
+    if data is None:
+        return create_response(status=400, message="Form data not provided")
+
+    for field in ["fileId", "userId", "friendId"]:
+        if field not in data:
+            return create_response(status=400, message=field + " not provided")
+
     logger.info("Data recieved: %s", data)
     f = request.files.get("file")
+    if f is None:
+        return create_response(status=400, message="File not provided")
 
     file_data = json.load(f)["messages"]
 
