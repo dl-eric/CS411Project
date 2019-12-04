@@ -23,19 +23,24 @@ def split_and_lower(s):
 
 def bar_plot_generator(title, bars, height):
     y_pos = np.arange(len(bars))
+    fig = plt.figure()
     plt.bar(y_pos, height)
     plt.xticks(y_pos, bars)
     plt.title(title)
-    plt.show()
+    fig.savefig(title + ' bar' + '.png')
+    #plt.clt()
 
 def word_cloud_generator(title, word_list):
-    wordcloud = WordCloud(background_color="black", colormap="rainbow").generate(word_list)
-    plt.imshow(wordcloud, interpolation='bilinear')
-    plt.title(title)
-    plt.axis("off")
-    plt.show()
+    if (len(word_list) > 0):
+        wordcloud = WordCloud(background_color="black", colormap="rainbow").generate(word_list)
+        fig = plt.figure()
+        plt.imshow(wordcloud, interpolation='bilinear')
+        plt.title(title)
+        plt.axis("off")
+        fig.savefig(title + ' wc' + '.png')
+    #plt.clt()
     
-def sentiment_analysis_np(sender, s):
+def sentiment_analysis_np(userid, friendid, sender, s):
     with open('sentiment_dict.json') as template:
         template_dct = json.load(template)
     neg = template_dct['negative']
@@ -47,12 +52,15 @@ def sentiment_analysis_np(sender, s):
     # Create bar plot
     height = [len(pos_list), len(neg_list)]
     bars = ('Positive', 'Negative')
-    bar_plot_generator(sender, bars, height)
+    bar_plot_generator(str(userid)+ str(friendid) + sender, bars, height)
 
     # Create word cloud
-    word_cloud_generator(sender + ' +', " ".join(pos_list))
-    word_cloud_generator(sender + ' -', " ".join(neg_list))
+    word_cloud_generator(str(userid)+ str(friendid) + sender + ' +', " ".join(pos_list))
+    word_cloud_generator(str(userid)+ str(friendid) + sender + ' -', " ".join(neg_list))
     
+def split_and_lower(s): 
+    return list(filter(None, re.split("[^a-z']", s.lower())))
+
 class FBManagement:
     def __init__(self):
         self.client = pymongo.MongoClient()
@@ -61,23 +69,37 @@ class FBManagement:
         print('Finished init')
     
     # insert messages into db
-    def insert_messages(self, filename):
+    def insert_file(self, userid, friendid, fileid, filename):
         with open(filename) as template:
             template_dct = json.load(template)
-            
+        
         messages = template_dct['messages']
+        
         for message in messages:
             key = 'content'
-            if key in message:
+            if ((key in message) and (message['type'] == 'Generic')):
                 content = message[key]
                 message[key] = split_and_lower(content)
                 message['word_count'] = len(message[key])
-
+                message['userid'] = userid
+                message['friendid'] = friendid
+                message['fileid'] = fileid
+        
         self.fb.insert_many(messages)
+        
         print('Finished insert')
     
+    def remove_user(self, userid):
+        self.fb.remove( { 'userid': userid } )
+        
+    def remove_friend(self, userid, friendid):
+        self.fb.remove( {'$and': [{ 'userid': userid }, { 'friendid' : friendid }] } )
+        
+    def remove_file(self, userid, friendid, fileid):
+        self.fb.remove( {'$and': [{'userid': userid }, { 'friendid' : friendid }, { 'fileid' : fileid }] } )
+        
     # counts # of messages sent by each person
-    def message_counts(self):
+    def message_counts(self, userid, friendid):
         mapper = Code(
         """
         function() {
@@ -97,13 +119,13 @@ class FBManagement:
         };
         """)
 
-        result = self.fb.map_reduce(mapper, reducer, "out")
+        result = self.fb.map_reduce(mapper, reducer, "out", query = {'$and': [{'userid': userid }, { 'friendid' : friendid }]})
 
         for doc in result.find():
             print(doc)
             
     # counts # of words sent by each person
-    def word_counts(self):
+    def word_counts(self, userid, friendid):
         mapper = Code(
         """
         function() {
@@ -123,13 +145,13 @@ class FBManagement:
         };
         """)
         
-        result = self.fb.map_reduce(mapper, reducer, "out", query = {'word_count': { "$gt": 0 }})
+        result = self.fb.map_reduce(mapper, reducer, "out", query = {'$and': [{'word_count': { "$gt": 0 }}, {'userid': userid }, { 'friendid' : friendid }]})
         
         for doc in result.find():
             print(doc)
     
     # returns most frequent reacts and frequency
-    def frequent_reacts(self):
+    def frequent_reacts(self, userid, friendid):
         mapper = Code(
         """
         function() {
@@ -148,7 +170,7 @@ class FBManagement:
         };
         """)
 
-        result = self.fb.map_reduce(mapper, reducer, "out", query = {'reactions': { "$exists": True }})
+        result = self.fb.map_reduce(mapper, reducer, "out", query = {'$and': [{ 'userid': userid }, { 'friendid' : friendid }, {'reactions': { "$exists": True }}]})
         
         emojis = []
         count = []
@@ -164,43 +186,57 @@ class FBManagement:
         bar_plot_generator("Frequent Reacts", emojis, count)
                     
     # sentiment analysis
-    def sentiment_analysis(self):
+    def sentiment_analysis(self, userid, friendid):
         messages = self.fb.aggregate(
-            [{"$match": {'word_count': { "$gt": 0 }}},
+            [{"$match": {'$and': [{'userid': userid }, { 'friendid' : friendid }, {'word_count': { "$gt": 0 }}]}},
             {"$unwind":"$content"},
             {"$group": {"_id": "$sender_name", "content": {"$push": "$content"}}}]
         )
         
         for message in messages:
-            sentiment_analysis_np(message['_id'], message['content'])
+            sentiment_analysis_np(userid, friendid, message['_id'], message['content'])
     
     # word cloud
-    def word_cloud(self):
+    def word_cloud(self, userid, friendid):
         messages = self.fb.aggregate(
-            [{"$match": {'word_count': { "$gt": 0 }}},
+            [{"$match": {'$and': [{'userid': userid }, { 'friendid' : friendid }, {'word_count': { "$gt": 0 }}]}},
             {"$unwind":"$content"},
             {"$group": {"_id": "$sender_name", "content": {"$push": "$content"}}}]
         )
         
         for m_arr in messages:
             message = " ".join(m_arr['content'])
-            word_cloud_generator(m_arr['_id'], message)  
-                      
-    def find_all_messages(self):
-        messages = self.fb.find()
+            word_cloud_generator(str(userid) + str(friendid) + m_arr['_id'], message)
+            
+    def find_messages_between(self, userid, friendid):
+        messages = self.fb.find( {'$and': [{ 'userid': userid }, { 'friendid' : friendid }] } )
+        
+        print("Number of records = " + str(messages.count()))
+        for message in messages:
+            print(message)
+            
+    def find_messages_in_file(self, userid, friendid, fileid):
+        messages = self.fb.find( {'$and': [{ 'userid': userid }, { 'friendid' : friendid }, { 'fileid': fileid }] } )
         print("Number of records = " + str(messages.count()))
         for message in messages:
             print(message)
 
     def drop_messages(self):
         self.fb.drop()
-        
+                
 if __name__ == "__main__":
     mongoDB = FBManagement()
-    mongoDB.insert_messages('message_1.json')
-    mongoDB.frequent_reacts()
-    mongoDB.message_counts()
-    mongoDB.word_counts()
-    mongoDB.word_cloud()
-    mongoDB.sentiment_analysis()
+    mongoDB.insert_file(1, 1, 1, 'message_1.json')
+    mongoDB.message_counts(1, 1)
+    mongoDB.word_counts(1, 1)
+    mongoDB.frequent_reacts(1, 1)
+    mongoDB.word_cloud(1, 1)
+    mongoDB.sentiment_analysis(1, 1)
+    
+    mongoDB.insert_file(1, 2, 1, 'message_2.json')
+    mongoDB.message_counts(1, 2)
+    mongoDB.word_counts(1, 2)
+    mongoDB.frequent_reacts(1, 2)
+    mongoDB.word_cloud(1, 2)
+    mongoDB.sentiment_analysis(1, 2)
     mongoDB.drop_messages()
