@@ -13,10 +13,7 @@ import {
   getSentiment
 } from "../../utils/ApiWrapper";
 import "../../public/style.scss";
-<<<<<<< HEAD
-=======
 import { Resizable } from "re-resizable";
->>>>>>> e3b17c4007b53a3a0ad071244dbbfb07a2a6dfec
 
 class FriendDetailPage extends Component {
   constructor(props) {
