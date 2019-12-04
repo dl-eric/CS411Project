@@ -370,7 +370,7 @@ def create_messages():
 
     db.message.insert_many(file_data)
 
-    return create_response(message=f"Successfully created new message")
+    return create_response(message=f"Successfully created new message", data=timestamp)
 
 
 def zipdir(path, ziph):
