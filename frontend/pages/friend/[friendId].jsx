@@ -7,8 +7,9 @@ import ReactWordcloud from "react-wordcloud";
 import {
   getFriend,
   changeFriendName,
-  getSentiment,
-  sendFile
+  sendFile,
+  getFiles,
+  getSentiment
 } from "../../utils/ApiWrapper";
 import "../../public/style.scss";
 import { Resizable } from "re-resizable";
@@ -29,14 +30,6 @@ class FriendDetailPage extends Component {
 
   async componentDidMount() {
     await this.getDataWrapper();
-    const response = await getSentiment(
-      this.state.friend.userId,
-      this.state.friendId
-    );
-    const { counts } = response;
-    this.setState({
-      counts
-    });
   }
 
   getDataWrapper = async () => {
@@ -48,10 +41,22 @@ class FriendDetailPage extends Component {
     this.setState({
       friend
     });
+    const timestamps = await getFiles(this.state.friend.userId, this.state.friendId)
+    this.setState({
+      fileTimes: timestamps
+    })
+    const response = await getSentiment(
+      this.state.friend.userId,
+      this.state.friendId
+    );
+    const { counts } = response;
+    this.setState({
+      counts
+    });
   };
 
   onDrop = async files => {
-    let timestamps = [];
+    let timestamps = this.state.fileTimes
     for (let file of files) {
       const res = await sendFile(
         file,
@@ -128,7 +133,7 @@ class FriendDetailPage extends Component {
           <h4>Uploaded Files:</h4>
           <ul>
             {this.state.fileTimes.map(fileTime => (
-              <li>{fileTime}</li>
+              <li key={fileTime._id}>{fileTime}</li>
             ))}
           </ul>
           <h4>Upload File</h4>

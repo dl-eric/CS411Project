@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Head } from "../../components";
 import {
-  CardHeader,
   Container,
   Button,
   Row,
@@ -14,7 +13,7 @@ import {
   Input,
   FormGroup,
   Label,
-  CardFooter
+  CardBody
 } from "reactstrap";
 import { getFriends, addFriend, deleteFriend } from "../../utils/ApiWrapper";
 import Router, { withRouter } from "next/router";
@@ -126,25 +125,27 @@ class FriendPage extends Component {
             {this.state.friends.map(friend => (
               <Col md="3" key={friend.friendId}>
                 <Card className="friend-card">
-                  <CardHeader>
+                  <CardBody>
                     <h3 align="center">{friend.name}</h3>
-                  </CardHeader>
-                  <CardFooter>
-                    <Button
-                      className="detail-btn"
-                      onClick={() => Router.push(`/friend/${friend.friendId}`)}
-                    >
-                      Details
-                    </Button>
-                    <Button
-                      className="detail-btn"
-                      onClick={() => {
-                        this.removeFriend(friend.friendId);
-                      }}
-                    >
+                    <div className='card-btns'>
+                      <Button
+                        className="detail-btn"
+                        color="secondary"
+                        onClick={() => Router.push(`/friend/${friend.friendId}`)}
+                      >
+                        Details
+                      </Button>
+                      <Button
+                        className="detail-btn"
+                        color="danger"
+                        onClick={() => {
+                          this.removeFriend(friend.friendId);
+                        }}
+                      >
                       Delete
                     </Button>
-                  </CardFooter>
+                    </div>
+                    </CardBody>
                 </Card>
               </Col>
             ))}

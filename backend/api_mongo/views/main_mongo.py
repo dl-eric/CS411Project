@@ -233,10 +233,7 @@ def sentiment_analysis(userId, friendId):
     ret = {}
 
     for message in messages:
-        ret[m_arr["_id"]] = {
-            "pos": sentiment_analysis_pos(message["content"]),
-            "neg": sentiment_analysis_neg(message["content"]),
-        }
+        ret[message["_id"]] = {'pos': sentiment_analysis_pos(message["content"]), 'neg': sentiment_analysis_neg(message["content"])}
 
     return ret
 
