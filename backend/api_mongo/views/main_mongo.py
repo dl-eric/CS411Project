@@ -229,10 +229,12 @@ def sentiment_analysis(userId, friendId):
         ]
     )
 
-    for message in messages:
-        print(sentiment_analysis_pos(message["content"]))
-        print(sentiment_analysis_neg(message["content"]))
+    ret = {}
 
+    for message in messages:
+        ret[m_arr["_id"]] = {'pos': sentiment_analysis_pos(message["content"]), 'neg': sentiment_analysis_neg(message["content"])}
+
+    return ret
 
 # word cloud
 def word_cloud(userId, friendId):
