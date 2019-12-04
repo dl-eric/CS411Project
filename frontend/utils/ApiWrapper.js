@@ -145,28 +145,26 @@ export const createFile = file => {
       console.log(error);
       return error.response;
     });
-}
+};
 
 export const sendFile = (file, userId, friendId) => {
-  let data = new FormData()
-  data.append('file', file)
-  data.append('userId', userId)
-  data.append('friendId', friendId)
+  let data = new FormData();
+  data.append("file", file);
+  data.append("userId", userId);
+  data.append("friendId", friendId);
 
   return axios
-    .post(BACKEND_URL + '/messages', data)
+    .post(BACKEND_URL + "/messages", data)
     .then(response => {
       return {
-        type: 'UPLOAD_FILE_SUCCESS',
+        type: "UPLOAD_FILE_SUCCESS",
         response
-      }
+      };
     })
     .catch(error => {
       return {
-        type: 'UPLOAD_FILE_FAIL',
+        type: "UPLOAD_FILE_FAIL",
         error
-      }
-    })
-}
-
-
+      };
+    });
+};

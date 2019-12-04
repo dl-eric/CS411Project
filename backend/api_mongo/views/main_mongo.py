@@ -65,6 +65,8 @@ def sentiment_analysis_np(userId, friendId, sender, s):
     pos_list = list((Counter(s) & Counter(pos)).elements())
     neg_list = list((Counter(s) & Counter(neg)).elements())
 
+    logger.info(Counter(pos_list))
+
     # Create bar plot
     height = [len(pos_list), len(neg_list)]
     bars = ("Positive", "Negative")
@@ -269,25 +271,23 @@ def sentiment_analysis(userId, friendId):
 def word_cloud(userId, friendId):
     messages = db.message.aggregate(
         [
-            {
-                "$match": {
-                    "$and": [
-                        {"userId": userId},
-                        {"friendId": friendId},
-                        {"word_count": {"$gt": 0}},
-                    ]
-                }
-            },
+            {"$match": {"userId": userId, "friendId": friendId}},
             {"$unwind": "$content"},
             {"$group": {"_id": "$sender_name", "content": {"$push": "$content"}}},
         ]
     )
+    logger.info("user %s", userId)
+    logger.info("friend %s", friendId)
+
+    ret = {}
 
     for m_arr in messages:
-        message = " ".join(m_arr["content"])
-        word_cloud_generator(
-            str(userId) + "_" + str(friendId) + "_" + m_arr["_id"], message
-        )
+        ret[m_arr["_id"]] = Counter(m_arr["content"])
+        # message = " ".join(m_arr["content"])
+        # word_cloud_generator(
+        #     str(userId) + "_" + str(friendId) + "_" + m_arr["_id"], message
+        # )
+    return ret
 
 
 def find_messages_between(userId, friendId):
@@ -374,7 +374,9 @@ def create_messages():
 
     db.message.insert_many(file_data)
 
-    return create_response(message=f"Successfully created new message", data={'timestamp':timestamp})
+    return create_response(
+        message=f"Successfully created new message", data={"timestamp": timestamp}
+    )
 
 
 def zipdir(path, ziph):
@@ -395,12 +397,20 @@ def get_sentiments():
     if not friendId:
         return create_response(status=400, message="Must specify friendId")
 
-    message_counts(friendId, userId)
-    word_counts(friendId, userId)
-    frequent_reacts(friendId, userId)
+    userId = str(userId)
+    friendId = str(friendId)
 
-    word_cloud(friendId, userId)
-    sentiment_analysis(friendId, userId)
+    message_counts(userId, friendId)
+    word_counts(userId, friendId)
+    frequent_reacts(userId, friendId)
+
+    counts = word_cloud(userId, friendId)
+    with open("sentiment_dict.json") as template:
+        template_dct = json.load(template)
+    neg = template_dct["negative"]
+    pos = template_dct["positive"]
+    # logger.info(counts)
+    sentiment_analysis(userId, friendId)
 
     # multi = MultipartEncoder(
     #     {"reactFile": (freq_react_file, open(freq_react_file), "text/plain")}
@@ -410,5 +420,5 @@ def get_sentiments():
 
     # send_from
 
-    return create_response(message="Success")
+    return create_response(data={"counts": counts, "neg": neg, "pos": pos})
 

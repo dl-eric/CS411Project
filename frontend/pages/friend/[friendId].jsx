@@ -3,7 +3,7 @@ import { Head } from "../../components";
 import { Button, Container, Input } from "reactstrap";
 import Dropzone from "react-dropzone";
 import { withRouter } from "next/router";
-import Unzipper from "unzipper";
+import ReactWordcloud from "react-wordcloud";
 import {
   getFriend,
   changeFriendName,
@@ -83,9 +83,19 @@ class FriendDetailPage extends Component {
   };
 
   getFriendSentiment = async () => {
-    const response = await getSentiment(this.state.userId, this.state.friendId);
-    const dir = await Unzipper.Open.buffer(response);
-    console.log(dir);
+    const response = await getSentiment(
+      this.state.friend.userId,
+      this.state.friendId
+    );
+    console.log(response);
+    let counts = {};
+    Object.keys(response.counts).forEach(person => {
+      counts[person] = Object.keys(response.counts[person]).map(word => ({
+        text: word,
+        value: response.counts[person][word]
+      }));
+    });
+    console.log(counts);
   };
 
   render() {
