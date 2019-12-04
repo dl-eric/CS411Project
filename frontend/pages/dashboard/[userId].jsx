@@ -16,6 +16,7 @@ import {
   CardBody
 } from "reactstrap";
 import { getFriends, addFriend, deleteFriend } from "../../utils/ApiWrapper";
+
 import Router, { withRouter } from "next/router";
 
 import "../../public/style.scss";
@@ -86,7 +87,7 @@ class FriendPage extends Component {
       <div className="app">
         <Container fluid>
           <Head title="Dashboard" />
-          <h1 align="center">Your Friends</h1>
+          <h1 align="center">Your Chatrooms</h1>
           <Modal isOpen={this.state.modalOpen}>
             <ModalBody>
               <Form>
@@ -115,9 +116,9 @@ class FriendPage extends Component {
             color="primary"
             onClick={this.openModal}
           >
-            Add New Friend
+            Add New Chatroom
           </Button>
-          <Button className="logout-btn" color="danger">
+          <Button className="logout-btn" color="danger" onClick={() => Router.push('/login')}>
             Logout
           </Button>
 
