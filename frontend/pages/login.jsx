@@ -85,9 +85,9 @@ export default class Login extends Component {
   render() {
     return (
       <div className="App">
-        <Container fluid className='login-container'>
+        <Container fluid className="login-container">
           <Head />
-          <h1 align='center'>Login</h1>
+          <h1 align="center">Login</h1>
           <Form>
             <FormGroup>
               <Input placeholder="username" onChange={this.updateUsername} />
@@ -99,8 +99,20 @@ export default class Login extends Component {
                 onChange={this.updatePassword}
               />
             </FormGroup>
-            <Button color='success' className='login-btn' onClick={this.handleLogin}>Log in</Button>
-            <Button color='primary' className='login-btn' onClick={this.handlesignUp}>Sign up</Button>
+            <Button
+              color="success"
+              className="login-btn"
+              onClick={this.handleLogin}
+            >
+              Log in
+            </Button>
+            <Button
+              color="primary"
+              className="login-btn"
+              onClick={this.handlesignUp}
+            >
+              Sign up
+            </Button>
             <p>{this.state.errorMessage}</p>
           </Form>
         </Container>

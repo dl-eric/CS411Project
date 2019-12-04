@@ -9,7 +9,7 @@ import Router from "next/router";
 import "../public/style.scss";
 
 export default class App extends Component {
-  async componentDidMount() {
+  componentDidMount() {
     Router.push("/login");
   }
 

@@ -35,7 +35,7 @@ export default class Head extends Component {
         <title>
           {`${
             this.props.title ? `${this.props.title} | ` : ""
-            }CS 411 Final Project`}
+          }CS 411 Final Project`}
         </title>
       </NextHead>
     );

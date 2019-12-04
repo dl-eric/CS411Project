@@ -126,7 +126,11 @@ class FriendPage extends Component {
           >
             Add New Chatroom
           </Button>
-          <Button className="logout-btn" color="danger" onClick={() => Router.push('/login')}>
+          <Button
+            className="logout-btn"
+            color="danger"
+            onClick={() => Router.push("/login")}
+          >
             Logout
           </Button>
 
