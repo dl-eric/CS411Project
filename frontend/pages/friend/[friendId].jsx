@@ -6,10 +6,12 @@ import { withRouter } from "next/router";
 import {
   getFriend,
   changeFriendName,
-  getSentiment,
-  sendFile
+  sendFile,
+  getFiles,
+  getTimeStamp
 } from "../../utils/ApiWrapper";
 import "../../public/style.scss";
+import { getPageFiles } from "next/dist/next-server/server/get-page-files";
 
 class FriendDetailPage extends Component {
   constructor(props) {
@@ -35,10 +37,19 @@ class FriendDetailPage extends Component {
     this.setState({
       friend
     });
+    const fileIds = await getFiles(this.state.friend.userId, this.state.friendId)
+    let timestamps = []
+    for (const fileId of fileIds.files) {
+      const timestamp = await getTimeStamp(fileId)
+      timestamps.push(timestamp.timestamp)
+    }
+    this.setState({
+      fileTimes: timestamps
+    })
   };
 
   onDrop = async files => {
-    let timestamps = []
+    let timestamps = this.state.fileTimes
     for (let file of files) {
       const res = await sendFile(file, this.state.friend.userId, this.state.friendId)
       const timestamp = res.response.data.result.timestamp

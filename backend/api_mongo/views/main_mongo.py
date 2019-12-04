@@ -330,9 +330,14 @@ def get_messages():
 
 @main_mongo.route('/messages/<user_id>/<friend_id>')
 def get_files(user_id, friend_id):
-    c = db.message.find({'userId': user_id, 'friendId': friend_id}, {'timestamp': 1})
+    logger.info('hi')
+    c = db.message.find({'userId': user_id, 'friendId': friend_id}, {'_id': 0, 'fileId': 1})
+    logger.info('hi2')
+    alice = set()
+    for a in c:
+        alice.add(a['fileId'])
 
-    return create_response(data={"files": list(c)})
+    return create_response(data={"files": list(alice)})
 
 @main_mongo.route("/messages", methods=["POST"])
 def create_messages():

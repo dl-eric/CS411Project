@@ -169,4 +169,28 @@ export const sendFile = (file, userId, friendId) => {
     })
 }
 
+export const getFiles = (userId, friendId) =>
+  axios
+    .get(`${BACKEND_URL}/messages/${userId}/${friendId}`)
+    .then(response => {
+      console.log(response);
+      return response.data.result;
+    })
+    .catch(error => {
+      console.log(error);
+      return error.response;
+    });
+
+export const getTimeStamp = fileId =>
+  axios
+    .get(`${BACKEND_URL}/file/${fileId}`)
+    .then(response => {
+      console.log(response);
+      return response.data.result;
+    })
+    .catch(error => {
+      console.log(error);
+      return error.response;
+    });
+
 
