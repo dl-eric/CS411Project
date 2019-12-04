@@ -17,11 +17,11 @@ import datetime
 
 main_mongo = Blueprint("main_mongo", __name__)  # initialize blueprint
 
-with open('sentiment_dict.json') as template:
-        template_dct = json.load(template)
+with open("sentiment_dict.json") as template:
+    template_dct = json.load(template)
 
-neg_set = set(template_dct['negative'])
-pos_set = set(template_dct['positive'])
+neg_set = set(template_dct["negative"])
+pos_set = set(template_dct["positive"])
 
 emoji_dict = {
     "ð\x9f\x98\x8d": "\U0001F60D",
@@ -33,6 +33,7 @@ emoji_dict = {
     "ð\x9f\x91\x8d": "\U0001F44D",
     "ð\x9f\x91\x8e": "\U0001F44E",
 }
+
 
 def bar_plot_generator(title, bars, height):
     y_pos = np.arange(len(bars))
@@ -62,13 +63,16 @@ def sentiment_analysis_pos(s):
     pos_dict = {k: v for k, v in l.items() if (k in pos_set)}
     return pos_dict
 
+
 def sentiment_analysis_neg(s):
     l = Counter(s)
     neg_dict = {k: v for k, v in l.items() if (k in neg_set)}
     return neg_dict
 
+
 def split_and_lower(s):
     return list(filter(None, re.split("[^a-z']", s.lower())))
+
 
 # insert messages into db
 def insert_file(userId, friendId, fileid, filename):
@@ -258,7 +262,7 @@ def sentiment_analysis(userId, friendId):
 def word_cloud(userId, friendId):
     messages = db.message.aggregate(
         [
-            {"$match": {"userId": userId, "friendId": friendId, "type", "Generic"}},
+            {"$match": {"userId": userId, "friendId": friendId, "type": "Generic"}},
             {"$unwind": "$content"},
             {"$group": {"_id": "$sender_name", "content": {"$push": "$content"}}},
         ]
