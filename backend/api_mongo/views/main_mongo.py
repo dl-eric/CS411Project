@@ -20,8 +20,10 @@ main_mongo = Blueprint("main_mongo", __name__)  # initialize blueprint
 with open('sentiment_dict.json') as template:
         template_dct = json.load(template)
 
-neg_set = set(template_dct['negative'])
-pos_set = set(template_dct['positive'])
+neg = template_dct['negative']
+pos = template_dct['positive']
+neg_set = set(neg)
+pos_set = set(pos)
 
 emoji_dict = {
     "ð\x9f\x98\x8d": "\U0001F60D",
@@ -34,29 +36,6 @@ emoji_dict = {
     "ð\x9f\x91\x8e": "\U0001F44E",
 }
 
-def bar_plot_generator(title, bars, height):
-    y_pos = np.arange(len(bars))
-    fig = plt.figure()
-    plt.bar(y_pos, height)
-    plt.xticks(y_pos, bars)
-    plt.title(title)
-    fig.savefig(os.path.join("files", title + " bar" + ".png"))
-    # plt.clt()
-
-
-def word_cloud_generator(title, word_list):
-    if len(word_list) > 0:
-        wordcloud = WordCloud(background_color="black", colormap="rainbow").generate(
-            word_list
-        )
-        fig = plt.figure()
-        plt.imshow(wordcloud, interpolation="bilinear")
-        plt.title(title)
-        plt.axis("off")
-        fig.savefig(os.path.join("files", title + " wc" + ".png"))
-    # plt.clt()
-
-
 def sentiment_analysis_pos(s):
     l = Counter(s)
     pos_dict = {k: v for k, v in l.items() if (k in pos_set)}
@@ -68,7 +47,7 @@ def sentiment_analysis_neg(s):
     return neg_dict
 
 def split_and_lower(s):
-    return list(filter(None, re.split("[^a-z']", s.lower())))
+    return list(filter(lambda x: len(x) > 1, re.split("[^a-z']", s.lower())))
 
 # insert messages into db
 def insert_file(userId, friendId, fileid, filename):
@@ -392,11 +371,6 @@ def get_sentiments():
     frequent_reacts(userId, friendId)
 
     counts = word_cloud(userId, friendId)
-    with open("sentiment_dict.json") as template:
-        template_dct = json.load(template)
-    neg = template_dct["negative"]
-    pos = template_dct["positive"]
-    # logger.info(counts)
     sentiment_analysis(userId, friendId)
 
     # multi = MultipartEncoder(
