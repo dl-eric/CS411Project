@@ -311,7 +311,7 @@ def get_messages():
 def get_files(user_id, friend_id):
     alice = set()
     timestamps = sqldb.session.execute(
-        "SELECT timestamp FROM Friend Fr JOIN File Fi ON Fr.friendId=Fi.id WHERE Fr.friendId=:id", {'id': friend_id}
+        "SELECT timestamp FROM Friend Fr JOIN File Fi ON Fr.friendId=Fi.friendId WHERE Fr.friendId=:id", {'id': friend_id}
     )
 
     for timestamp in timestamps:
