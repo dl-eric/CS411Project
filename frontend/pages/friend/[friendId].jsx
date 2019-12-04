@@ -151,14 +151,14 @@ class FriendDetailPage extends Component {
           {this.state.counts &&
             Object.keys(this.state.counts).map(person => (
               <>
-                <Button
+                <Button className='sentiment-btn'
                   onClick={() =>
                     this.setState({ person, sentiment: "Positive" })
                   }
                 >
                   {person} - Positive
                 </Button>
-                <Button
+                <Button className='sentiment-btn'
                   onClick={() =>
                     this.setState({ person, sentiment: "Negative" })
                   }

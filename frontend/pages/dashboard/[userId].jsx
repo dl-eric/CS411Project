@@ -156,7 +156,7 @@ class FriendPage extends Component {
                         Delete
                       </Button>
                       {this.state.counts && (
-                        <p>
+                        <h5 className="msg-count">
                           Total messages:{" "}
                           {this.state.counts.some(
                             count => count.friendId === friend.friendId
@@ -165,7 +165,7 @@ class FriendPage extends Component {
                                 count => count.friendId === friend.friendId
                               ).sumMessages || 0
                             : 0}
-                        </p>
+                        </h5>
                       )}
                     </div>
                   </CardBody>
