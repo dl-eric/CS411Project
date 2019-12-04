@@ -10,7 +10,15 @@ git clone https://github.com/amueller/word_cloud.git
 cd word_cloud
 pip install .
 ```
-Run 'python3 mongoDBAnalysis.py' after putting file named 'message_1.json' in the same folder 
+
+Have:
+```
+brew services start mongodb-community
+mongo
+```
+running
+
+Run 'python3 mongoDBAnalysis.py' after putting file named 'message_1.json' and 'message_2.json' in the same folder 
 
 Mohammad, S. M., & Turney, P. D. (2013). Crowdsourcing A Word-Emotion Association
 Lexicon. Computational Intelligence,29(3), 436-465. doi:10.1111/j.1467-
