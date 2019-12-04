@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from api_mongo.models import db, Person, Message
 from api_mongo.core import create_response, serialize_list, logger
+import json
 
 main_mongo = Blueprint("main_mongo", __name__)  # initialize blueprint
 
@@ -17,21 +18,32 @@ def get_messages():
 
 
 @main_mongo.route("/messages", methods=["POST"])
-def create_message():
-    data = request.json
+def create_messages():
+    data = request.form
     logger.info("Data recieved: %s", data)
+    f = request.files.get("file")
 
-    new_message = Message(
-        sender=data["sender"],
-        timestamp=data["timestamp"],
-        content=data["content"],
-        message_type=data["message_type"],
-        file_id=data["file_id"],
-        user_id=data["user_id"],
-        friend_id=data["friend_id"],
-        reactions=data["reactions"],
-    )
-    new_message.save()
+    file_data = json.load(f)
+
+    for message in file_data["messages"]:
+        if "content" not in message:
+            continue
+        new_message = Message(
+            sender=message["sender_name"],
+            timestamp=message["timestamp_ms"],
+            content=message["content"],
+            message_type=message["type"],
+            file_id=data["file_id"],
+            user_id=data["user_id"],
+            friend_id=data["friend_id"],
+            reactions=(
+                [reaction["reaction"] for reaction in message["reactions"]]
+                if "reactions" in message
+                else None
+            ),
+        )
+        new_message.save()
+
     return create_response(message=f"Successfully created new message")
 
 
