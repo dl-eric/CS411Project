@@ -11,6 +11,7 @@ import {
   sendFile
 } from "../../utils/ApiWrapper";
 import "../../public/style.scss";
+import Wordcloud from "react-wordcloud";
 
 class FriendDetailPage extends Component {
   constructor(props) {
@@ -19,7 +20,8 @@ class FriendDetailPage extends Component {
       friend: {},
       friendId: "",
       fileTimes: [],
-      isEditingName: false
+      isEditingName: false,
+      counts: null
     };
   }
 
@@ -90,12 +92,17 @@ class FriendDetailPage extends Component {
     console.log(response);
     let counts = {};
     Object.keys(response.counts).forEach(person => {
-      counts[person] = Object.keys(response.counts[person]).map(word => ({
-        text: word,
-        value: response.counts[person][word]
-      }));
+      counts[person] = Object.keys(response.counts[person])
+        .map(word => ({
+          text: word,
+          value: response.counts[person][word]
+        }))
+        .sort((left, right) => left.value < right.value)
+        .slice(0, 100);
     });
-    console.log(counts);
+    this.setState({
+      counts
+    });
   };
 
   render() {
@@ -140,6 +147,13 @@ class FriendDetailPage extends Component {
             )}
           </Dropzone>
           <Button onClick={this.getFriendSentiment}>getFriendSentiment</Button>
+          {this.state.counts &&
+            Object.keys(this.state.counts).map(person => (
+              <>
+                <h4>{person}</h4>
+                <ReactWordcloud words={this.state.counts[person]} />
+              </>
+            ))}
         </Container>
       </div>
     );
