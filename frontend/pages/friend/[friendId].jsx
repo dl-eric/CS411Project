@@ -133,7 +133,7 @@ class FriendDetailPage extends Component {
           <h4>Uploaded Files:</h4>
           <ul>
             {this.state.fileTimes.map(fileTime => (
-              <li>{fileTime}</li>
+              <li key={fileTime._id}>{fileTime}</li>
             ))}
           </ul>
           <h4>Upload File</h4>

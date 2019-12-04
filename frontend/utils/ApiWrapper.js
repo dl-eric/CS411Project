@@ -1,4 +1,5 @@
 import axios from "axios";
+const FormData = require('form-data');
 
 const BACKEND_URL = "http://localhost:5000";
 
@@ -134,19 +135,6 @@ export const updateSentiment = (friendId, sentiment) =>
       return error.response;
     });
 
-export const createFile = file => {
-  axios
-    .post(`${BACKEND_URL}/sentiments/${friendId}`, file)
-    .then(response => {
-      console.log(response);
-      return response;
-    })
-    .catch(error => {
-      console.log(error);
-      return error.response;
-    });
-};
-
 export const sendFile = (file, userId, friendId) => {
   let data = new FormData();
   data.append("file", file);
@@ -154,19 +142,19 @@ export const sendFile = (file, userId, friendId) => {
   data.append("friendId", friendId);
 
   return axios
-    .post(BACKEND_URL + "/messages", data)
-    .then(response => {
-      return {
+    .post(`${BACKEND_URL}/messages`, data)
+    .then(response => (
+      {
         type: "UPLOAD_FILE_SUCCESS",
         response
-      };
-    })
-    .catch(error => {
-      return {
+      }
+    )
+    .catch(error => (
+      {
         type: "UPLOAD_FILE_FAIL",
         error
       }
-    })
+    )))
 }
 
 export const getFiles = (userId, friendId) =>
