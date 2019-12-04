@@ -123,15 +123,16 @@ class FriendDetailPage extends Component {
             Edit Name
           </Button>
           {this.state.isEditingName && (
-            <>
+            <div className='edit-name-container'>
               <Input
                 name="newName"
                 label="New Name"
                 onChange={this.handleChange}
+                placeholder='Enter New Name'
               />
-              <Button onClick={this.changeName}>Submit</Button>
-              <Button onClick={this.cancelEditName}>Cancel</Button>
-            </>
+              <Button color='success' className='edit-name-btn' onClick={this.changeName}>Submit</Button>
+              <Button color='danger' className='edit-name-btn' onClick={this.cancelEditName}>Cancel</Button>
+            </div>
           )}
           <Button
             className="logout-btn"
