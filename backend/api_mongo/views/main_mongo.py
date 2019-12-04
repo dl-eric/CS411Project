@@ -309,10 +309,15 @@ def get_messages():
 
 @main_mongo.route("/messages/<user_id>/<friend_id>")
 def get_files(user_id, friend_id):
-    c = db.message.find({"userId": user_id, "friendId": friend_id}, {"timestamp": 1})
+    alice = set()
+    timestamps = sqldb.session.execute(
+        "SELECT timestamp FROM Friend Fr JOIN File Fi ON Fr.friendId=Fi.id WHERE Fr.friendId=:id", {'id': friend_id}
+    )
 
-    return create_response(data={"files": list(c)})
+    for timestamp in timestamps:
+        alice.add(timestamp.timestamp)
 
+    return create_response(data={'timestamps': list(alice)})
 
 @main_mongo.route("/messages", methods=["POST"])
 def create_messages():
@@ -320,7 +325,7 @@ def create_messages():
 
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     sqldb.session.execute(
-        "INSERT INTO File (timestamp) VALUES (:timestamp)", {"timestamp": timestamp}
+        "INSERT INTO File (timestamp, friendId) VALUES (:timestamp, :id)", {"timestamp": timestamp, 'id': data['friendId']}
     )
     sqldb.session.commit()
 
