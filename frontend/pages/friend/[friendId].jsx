@@ -41,12 +41,7 @@ class FriendDetailPage extends Component {
     this.setState({
       friend
     });
-    const fileIds = await getFiles(this.state.friend.userId, this.state.friendId)
-    let timestamps = []
-    for (const fileId of fileIds) {
-      const timestamp = await getTimeStamp(fileId)
-      timestamps.push(timestamp)
-    }
+    const timestamps = await getFiles(this.state.friend.userId, this.state.friendId)
     this.setState({
       fileTimes: timestamps
     })
@@ -101,7 +96,6 @@ class FriendDetailPage extends Component {
       this.state.friend.userId,
       this.state.friendId
     );
-    console.log(response)
     let counts = {};
     const { pos, neg } = response;
     Object.keys(response.counts).forEach(person => {

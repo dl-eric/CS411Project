@@ -174,19 +174,7 @@ export const getFiles = (userId, friendId) =>
     .get(`${BACKEND_URL}/messages/${userId}/${friendId}`)
     .then(response => {
       console.log(response);
-      return response.data.result.files;
-    })
-    .catch(error => {
-      console.log(error);
-      return error.response;
-    });
-
-export const getTimeStamp = fileId =>
-  axios
-    .get(`${BACKEND_URL}/file/${fileId}`)
-    .then(response => {
-      console.log(response);
-      return response.data.result.timestamp;
+      return response.data.result.timestamps;
     })
     .catch(error => {
       console.log(error);
