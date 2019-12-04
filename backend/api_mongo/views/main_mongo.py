@@ -347,7 +347,7 @@ def create_messages():
     if data is None:
         return create_response(status=400, message="Form data not provided")
 
-    for field in ["fileId", "userId", "friendId"]:
+    for field in ["userId", "friendId"]:
         if field not in data:
             return create_response(status=400, message=field + " not provided")
 
