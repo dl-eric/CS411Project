@@ -345,9 +345,14 @@ def create_messages():
     file_data = json.load(f)["messages"]
 
     for message in file_data:
-        message["fileId"] = data["fileId"]
-        message["userId"] = data["userId"]
-        message["friendId"] = data["friendId"]
+        key = 'content'
+        if ((key in message) and (message['type'] == 'Generic')):
+            content = message[key]
+            message[key] = split_and_lower(content)
+            message['word_count'] = len(message[key])
+            message["fileId"] = data["fileId"]
+            message["userId"] = data["userId"]
+            message["friendId"] = data["friendId"]
 
     db.message.insert_many(file_data)
 
