@@ -16,7 +16,12 @@ import {
   Label,
   CardFooter
 } from "reactstrap";
-import { getFriends, addFriend, deleteFriend } from "../../utils/ApiWrapper";
+import {
+  getFriends,
+  addFriend,
+  deleteFriend,
+  getMessageCounts
+} from "../../utils/ApiWrapper";
 import Router, { withRouter } from "next/router";
 
 import "../../public/style.scss";
@@ -27,12 +32,16 @@ class FriendPage extends Component {
     this.state = {
       friends: [],
       modalOpen: false,
-      userId: 0
+      userId: 0,
+      counts: null
     };
   }
 
   async componentDidMount() {
     await this.getFriendsWrapper();
+    const messageCounts = await getMessageCounts(this.state.userId);
+    console.log(messageCounts);
+    this.setState({ counts: messageCounts.counts });
   }
 
   getFriendsWrapper = async () => {
@@ -144,6 +153,18 @@ class FriendPage extends Component {
                     >
                       Delete
                     </Button>
+                    {this.state.counts && (
+                      <p>
+                        Total messages:{" "}
+                        {this.state.counts.some(
+                          count => count.friendId === friend.friendId
+                        )
+                          ? this.state.counts.find(
+                              count => count.friendId === friend.friendId
+                            ).sumMessages || 0
+                          : 0}
+                      </p>
+                    )}
                   </CardFooter>
                 </Card>
               </Col>

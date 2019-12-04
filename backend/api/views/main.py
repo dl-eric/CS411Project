@@ -195,13 +195,16 @@ def sentiments():
 @main.route("/messagecount/<id>", methods=["PUT", "GET"])
 def get_message_count(id):
     result = db.session.execute(
-        "SELECT SUM(totalMessages) as A FROM User U JOIN Friend Fr on U.userId=Fr.userId JOIN File Fi on Fr.friendId=Fi.friendId WHERE U.userId=(:id) GROUP BY Fr.friendId",
+        "SELECT Fr.friendId, SUM(Fi.totalMessages) as sumMessages FROM User U JOIN Friend Fr on U.userId=Fr.userId JOIN File Fi on Fr.friendId=Fi.friendId WHERE U.userId=(:id) GROUP BY Fr.friendId",
         {"id": id},
     )
 
-   ret = [dict(row) for row in result]
+    ret = [dict(row) for row in result]
+    for entry in ret:
+        if entry["sumMessages"] is not None:
+            entry["sumMessages"] = int(entry["sumMessages"])
 
-    return create_response(data={"result": ret})
+    return create_response(data={"counts": ret})
 
 
 @main.route("/sentiments/<id>", methods=["PUT", "GET"])

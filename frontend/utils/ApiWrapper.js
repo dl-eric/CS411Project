@@ -74,6 +74,18 @@ export const getFriend = friendId =>
       return error.response;
     });
 
+export const getMessageCounts = id =>
+  axios
+    .get(`${BACKEND_URL}/messagecount/${id}`)
+    .then(response => {
+      console.log(response);
+      return response.data.result;
+    })
+    .catch(error => {
+      console.log(error);
+      return error.response;
+    });
+
 export const changeFriendName = (friendId, friend) =>
   axios
     .put(`${BACKEND_URL}/friends/${friendId}`, friend)
