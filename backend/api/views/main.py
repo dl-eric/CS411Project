@@ -199,7 +199,7 @@ def get_message_count(id):
         {"id": id},
     )
 
-   ret = [dict(row) for row in result]
+    ret = [dict(row) for row in result]
 
     return create_response(data={"result": ret})
 
