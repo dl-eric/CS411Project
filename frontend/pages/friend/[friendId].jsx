@@ -3,6 +3,7 @@ import { Head } from "../../components";
 import { Button, Container, Input } from "reactstrap";
 import Dropzone from "react-dropzone";
 import { withRouter } from "next/router";
+import ReactWordcloud from "react-wordcloud";
 import {
   getFriend,
   changeFriendName,
@@ -11,7 +12,7 @@ import {
   getTimeStamp
 } from "../../utils/ApiWrapper";
 import "../../public/style.scss";
-import { getPageFiles } from "next/dist/next-server/server/get-page-files";
+import Wordcloud from "react-wordcloud";
 
 class FriendDetailPage extends Component {
   constructor(props) {
@@ -20,7 +21,10 @@ class FriendDetailPage extends Component {
       friend: {},
       friendId: "",
       fileTimes: [],
-      isEditingName: false
+      isEditingName: false,
+      counts: null,
+      pos: null,
+      neg: null
     };
   }
 
@@ -92,6 +96,29 @@ class FriendDetailPage extends Component {
     });
   };
 
+  getFriendSentiment = async () => {
+    const response = await getSentiment(
+      this.state.friend.userId,
+      this.state.friendId
+    );
+    let counts = {};
+    const { pos, neg } = response;
+    Object.keys(response.counts).forEach(person => {
+      counts[person] = Object.keys(response.counts[person])
+        .map(word => ({
+          text: word,
+          value: response.counts[person][word]
+        }))
+        .sort((left, right) => right.value - left.value);
+    });
+    console.log(counts);
+    this.setState({
+      counts,
+      pos,
+      neg
+    });
+  };
+
   render() {
     return (
       <div className="app">
@@ -134,6 +161,24 @@ class FriendDetailPage extends Component {
             )}
           </Dropzone>
           <Button onClick={this.getFriendSentiment}>getFriendSentiment</Button>
+          {this.state.counts &&
+            Object.keys(this.state.counts).map(person => (
+              <>
+                <h3>{person}</h3>
+                <h3>Positive</h3>
+                <ReactWordcloud
+                  words={this.state.counts[person].filter(word =>
+                    this.state.pos.includes(word.text)
+                  )}
+                />
+                <h3>Negative</h3>
+                <ReactWordcloud
+                  words={this.state.counts[person].filter(word =>
+                    this.state.neg.includes(word.text)
+                  )}
+                />
+              </>
+            ))}
         </Container>
       </div>
     );
