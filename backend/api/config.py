@@ -29,10 +29,10 @@ class DevelopmentConfig(Config):
     cmd in the setup instructions. You can change this to environment variable as well. 
     """
 
-    user = os.environ.get('MYSQL_USER').replace('\r', '')
-    password = os.environ.get('MYSQL_PASSWORD').replace('\r', '')
-    db = os.environ.get('MYSQL_DB').replace('\r', '')
-    ip = os.environ.get('MYSQL_IP').replace('\r', '')
+    user = os.environ.get('MYSQL_USER', '').replace('\r', '')
+    password = os.environ.get('MYSQL_PASSWORD', '').replace('\r', '')
+    db = os.environ.get('MYSQL_DB', '').replace('\r', '')
+    ip = os.environ.get('MYSQL_IP', '').replace('\r', '')
 
     connection_str = "mysql://" + user + ":" + password + "@" + ip + ":3306/" + db
 
