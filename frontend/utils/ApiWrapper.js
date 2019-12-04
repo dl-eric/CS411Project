@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BACKEND_URL = "http://52.240.158.249:5000";
+const BACKEND_URL = "http://localhost:5000";
 
 export const helloWorld = () =>
   axios
@@ -133,3 +133,40 @@ export const updateSentiment = (friendId, sentiment) =>
       console.log(error);
       return error.response;
     });
+
+export const createFile = file => {
+  axios
+    .post(`${BACKEND_URL}/sentiments/${friendId}`, file)
+    .then(response => {
+      console.log(response);
+      return response;
+    })
+    .catch(error => {
+      console.log(error);
+      return error.response;
+    });
+}
+
+export const sendFile = (file, userId, friendId) => {
+  let data = new FormData()
+  data.append('file', file)
+  data.append('userId', userId)
+  data.append('friendId', friendId)
+
+  return axios
+    .post(BACKEND_URL + '/messages', data)
+    .then(response => {
+      return {
+        type: 'UPLOAD_FILE_SUCCESS',
+        response
+      }
+    })
+    .catch(error => {
+      return {
+        type: 'UPLOAD_FILE_FAIL',
+        error
+      }
+    })
+}
+
+

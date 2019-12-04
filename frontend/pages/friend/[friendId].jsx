@@ -7,7 +7,7 @@ import {
   getFriend,
   changeFriendName,
   getSentiment,
-  updateSentiment
+  sendFile
 } from "../../utils/ApiWrapper";
 import "../../public/style.scss";
 
@@ -29,22 +29,20 @@ class FriendDetailPage extends Component {
 
   getDataWrapper = async () => {
     const { friendId } = this.props.router.query;
+    console.log(friendId)
     this.setState({
       friendId
     });
     const friend = await getFriend(friendId);
-    const sentiment = await getSentiment(friendId);
     this.setState({
-      friend,
-      sentiment
+      friend
     });
   };
 
   onDrop = async files => {
-    const newSentiment = {
-      filename: files[0].name
-    };
-    await updateSentiment(this.state.friendId, newSentiment);
+    for (let file of files) {
+      await sendFile(file, this.state.friend.userId, this.state.friendId)
+    }
     await this.getDataWrapper();
   };
 
@@ -99,7 +97,6 @@ class FriendDetailPage extends Component {
               <Button onClick={this.cancelEditName}>Cancel</Button>
             </>
           )}
-          <h4>File: {this.state.sentiment.fileName}</h4>
           <h4>Upload File</h4>
           <Dropzone onDrop={this.onDrop}>
             {({ getRootProps, getInputProps }) => (
