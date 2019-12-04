@@ -9,7 +9,6 @@ import {
   changeFriendName,
   sendFile,
   getFiles,
-  getTimeStamp,
   getSentiment
 } from "../../utils/ApiWrapper";
 import "../../public/style.scss";
@@ -31,14 +30,6 @@ class FriendDetailPage extends Component {
 
   async componentDidMount() {
     await this.getDataWrapper();
-    const response = await getSentiment(
-      this.state.friend.userId,
-      this.state.friendId
-    );
-    const { counts } = response;
-    this.setState({
-      counts
-    });
   }
 
   getDataWrapper = async () => {
@@ -54,6 +45,14 @@ class FriendDetailPage extends Component {
     this.setState({
       fileTimes: timestamps
     })
+    const response = await getSentiment(
+      this.state.friend.userId,
+      this.state.friendId
+    );
+    const { counts } = response;
+    this.setState({
+      counts
+    });
   };
 
   onDrop = async files => {
