@@ -17,9 +17,8 @@ class FriendDetailPage extends Component {
     this.state = {
       friend: {},
       friendId: "",
-      sentiment: {},
+      fileTimes: [],
       isEditingName: false,
-      newFile: ""
     };
   }
 
@@ -29,7 +28,6 @@ class FriendDetailPage extends Component {
 
   getDataWrapper = async () => {
     const { friendId } = this.props.router.query;
-    console.log(friendId)
     this.setState({
       friendId
     });
@@ -40,9 +38,15 @@ class FriendDetailPage extends Component {
   };
 
   onDrop = async files => {
+    let timestamps = []
     for (let file of files) {
-      await sendFile(file, this.state.friend.userId, this.state.friendId)
+      const res = await sendFile(file, this.state.friend.userId, this.state.friendId)
+      const timestamp = res.response.data.result.timestamp
+      timestamps.push(timestamp)
     }
+    this.setState({
+      fileTimes: timestamps
+    })
     await this.getDataWrapper();
   };
 
@@ -97,6 +101,12 @@ class FriendDetailPage extends Component {
               <Button onClick={this.cancelEditName}>Cancel</Button>
             </>
           )}
+          <h4>Uploaded Files:</h4>
+          <ul>
+            {this.state.fileTimes.map(fileTime => (
+              <li>{fileTime}</li>
+            ))}
+          </ul>
           <h4>Upload File</h4>
           <Dropzone onDrop={this.onDrop}>
             {({ getRootProps, getInputProps }) => (
