@@ -1,7 +1,7 @@
 import axios from "axios";
-const FormData = require('form-data');
+const FormData = require("form-data");
 
-const BACKEND_URL = "http://localhost:5000";
+const BACKEND_URL = "http://52.240.158.249:5000";
 
 export const helloWorld = () =>
   axios
@@ -66,6 +66,18 @@ export const getFriends = userId =>
 export const getFriend = friendId =>
   axios
     .get(`${BACKEND_URL}/friends/${friendId}`)
+    .then(response => {
+      console.log(response);
+      return response.data.result;
+    })
+    .catch(error => {
+      console.log(error);
+      return error.response;
+    });
+
+export const getMessageCounts = id =>
+  axios
+    .get(`${BACKEND_URL}/messagecount/${id}`)
     .then(response => {
       console.log(response);
       return response.data.result;
@@ -153,9 +165,9 @@ export const sendFile = (file, userId, friendId) => {
       return {
         type: "UPLOAD_FILE_FAIL",
         error
-      }
-    })
-}
+      };
+    });
+};
 
 export const getFiles = (userId, friendId) =>
   axios
@@ -168,5 +180,3 @@ export const getFiles = (userId, friendId) =>
       console.log(error);
       return error.response;
     });
-
-
