@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, send_file
 from api_mongo.models import db
+from api.models.base import db as sqldb
 from api_mongo.core import create_response, serialize_list, logger
 import pymongo
 import json
@@ -12,6 +13,7 @@ import numpy as np
 from requests_toolbelt import MultipartEncoder
 import os
 import zipfile
+import datetime
 
 main_mongo = Blueprint("main_mongo", __name__)  # initialize blueprint
 
@@ -331,6 +333,17 @@ def get_messages():
 def create_messages():
     data = request.form
 
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    sqldb.session.execute(
+        "INSERT INTO File (timestamp) VALUES (:timestamp)", {"timestamp": timestamp}
+    )
+    sqldb.session.commit()
+
+    c = sqldb.session.execute(
+        "SELECT id FROM File WHERE timestamp=:timestamp", {"timestamp": timestamp}
+    )
+    file_id = c.fetchone()["id"]
+
     if data is None:
         return create_response(status=400, message="Form data not provided")
 
@@ -351,7 +364,7 @@ def create_messages():
             content = message[key]
             message[key] = split_and_lower(content)
             message["word_count"] = len(message[key])
-            message["fileId"] = data["fileId"]
+            message["fileId"] = file_id
             message["userId"] = data["userId"]
             message["friendId"] = data["friendId"]
 
