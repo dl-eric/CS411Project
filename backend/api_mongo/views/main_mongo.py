@@ -328,6 +328,11 @@ def get_messages():
 
     return create_response(data={"messages": messages})
 
+@main_mongo.route('/messages/<user_id>/<friend_id>')
+def get_files(user_id, friend_id):
+    c = db.message.find({'userId': user_id, 'friendId': friend_id}, {'timestamp': 1})
+
+    return create_response(data={"files": list(c)})
 
 @main_mongo.route("/messages", methods=["POST"])
 def create_messages():
