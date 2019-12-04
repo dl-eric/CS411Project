@@ -359,37 +359,6 @@ def create_messages():
     return create_response(message=f"Successfully created new message")
 
 
-# function that is called when you visit /persons
-@main_mongo.route("/persons", methods=["GET"])
-def get_persons():
-    persons = db.person.find()
-    return create_response(data={"persons": persons})
-
-
-# POST request for /persons
-@main_mongo.route("/persons", methods=["POST"])
-def create_person():
-    data = request.json
-
-    logger.info("Data recieved: %s", data)
-    # logger.info(data.to_dict())
-    if "name" not in data:
-        msg = "No name provided for person."
-        logger.info(msg)
-        return create_response(status=422, message=msg)
-    if "email" not in data:
-        msg = "No email provided for person."
-        logger.info(msg)
-        return create_response(status=422, message=msg)
-
-    #  create MongoEngine objects
-    db.person.insert_one({"name": data["name"], "email": data["email"]})
-
-    return create_response(
-        message=f"Successfully created person {data['name']} with id: {data['email']}"
-    )
-
-
 @main_mongo.route("/sentiments", methods=["GET"])
 def get_sentiments():
     userId = request.args.get("userId")
