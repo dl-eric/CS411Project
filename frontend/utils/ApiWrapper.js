@@ -165,7 +165,6 @@ export const sendFile = (file, userId, friendId) => {
       return {
         type: "UPLOAD_FILE_FAIL",
         error
-<<<<<<< HEAD
       }
     })
 }
@@ -195,8 +194,3 @@ export const getTimeStamp = fileId =>
     });
 
 
-=======
-      };
-    });
-};
->>>>>>> b94a4898a3c6d5b4d8cdef60fc88ce81277cad67
