@@ -9,10 +9,10 @@ import {
   changeFriendName,
   sendFile,
   getFiles,
-  getTimeStamp
+  getTimeStamp,
+  getSentiment
 } from "../../utils/ApiWrapper";
 import "../../public/style.scss";
-import Wordcloud from "react-wordcloud";
 
 class FriendDetailPage extends Component {
   constructor(props) {
@@ -101,6 +101,7 @@ class FriendDetailPage extends Component {
       this.state.friend.userId,
       this.state.friendId
     );
+    console.log(response)
     let counts = {};
     const { pos, neg } = response;
     Object.keys(response.counts).forEach(person => {
