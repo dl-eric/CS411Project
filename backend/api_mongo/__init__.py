@@ -80,10 +80,11 @@ def create_app(test_config=None):
     # }
 
     # register mongoengine to this app
-    from api_mongo.models import db
+    # from api_mongo.models import db
 
-    db.init_app(app)  # initialize Flask MongoEngine with this flask app
-    Migrate(app, db)
+    # db.init_app(app)  # initialize Flask MongoEngine with this flask app
+    
+    #Migrate(app, db)
 
     # import and register blueprints
     from api_mongo.views import main_mongo
