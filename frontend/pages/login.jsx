@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Head } from "../components";
-import { Button, Form, FormGroup, Input } from "reactstrap";
+import { Button, Form, FormGroup, Input, Container } from "reactstrap";
 
 import Router from "next/router";
 
@@ -85,22 +85,25 @@ export default class Login extends Component {
   render() {
     return (
       <div className="App">
-        <Head />
-        <Form>
-          <FormGroup>
-            <Input placeholder="username" onChange={this.updateUsername} />
-          </FormGroup>
-          <FormGroup>
-            <Input
-              type="password"
-              placeholder="password"
-              onChange={this.updatePassword}
-            />
-          </FormGroup>
-          <Button onClick={this.handleLogin}>Log in</Button>
-          <Button onClick={this.handlesignUp}>Sign up</Button>
-          <p>{this.state.errorMessage}</p>
-        </Form>
+        <Container fluid className='login-container'>
+          <Head />
+          <h1 align='center'>Login</h1>
+          <Form>
+            <FormGroup>
+              <Input placeholder="username" onChange={this.updateUsername} />
+            </FormGroup>
+            <FormGroup>
+              <Input
+                type="password"
+                placeholder="password"
+                onChange={this.updatePassword}
+              />
+            </FormGroup>
+            <Button color='success' className='detail-btn' onClick={this.handleLogin}>Log in</Button>
+            <Button color='primary' onClick={this.handlesignUp}>Sign up</Button>
+            <p>{this.state.errorMessage}</p>
+          </Form>
+        </Container>
       </div>
     );
   }
