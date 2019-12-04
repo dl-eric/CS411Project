@@ -66,26 +66,6 @@ def create_app(test_config=None):
     root = logging.getLogger("core")
     root.addHandler(strm)
 
-    # decide whether to create database
-    # if env != "prod":
-    #     db_url = app.config["SQLALCHEMY_DATABASE_URI"]
-    #     if not database_exists(db_url):
-    #         create_database(db_url)
-
-    app.config["MONGO_URI"] = os.environ.get("MONGO_URL")
-    # app.config["MONGODB_SETTINGS"] = {
-    #     "db": "communityconnect-labs",
-    #     "host": "127.0.0.1",
-    #     "port": 27017,
-    # }
-
-    # register mongoengine to this app
-    # from api_mongo.models import db
-
-    # db.init_app(app)  # initialize Flask MongoEngine with this flask app
-    
-    #Migrate(app, db)
-
     # import and register blueprints
     from api_mongo.views import main_mongo
 
