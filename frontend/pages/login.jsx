@@ -91,7 +91,7 @@ export default class Login extends Component {
   };
 
   handleKeyPress = event => {
-    if (event.key == "Enter") {
+    if (event.key === "Enter") {
       this.state.modal ? this.handleSignUp() : this.handleLogin();
     }
   }

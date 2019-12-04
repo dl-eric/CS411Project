@@ -1,7 +1,12 @@
 {
-  "plugins": ["@h4iuiuc"],
-  "extends": ["plugin:@h4iuiuc/recommended"],
+  "plugins": [
+    "@h4iuiuc"
+  ],
+  "extends": [
+    "plugin:@h4iuiuc/recommended"
+  ],
   "rules": {
-    "no-magic-numbers": "off"
+    "no-magic-numbers": "off",
+    "jsx-a11y/no-static-element-interactions": "off"
   }
 }
