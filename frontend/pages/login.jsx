@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Head } from "../components";
-import { Button, Form, FormGroup, Input, Container, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
+import { Button, Form, FormGroup, Input, Container, Modal, ModalHeader, ModalBody, ModalFooter, Alert } from "reactstrap";
 
 import Router from "next/router";
 
@@ -146,7 +146,9 @@ export default class Login extends Component {
               >
                 Close
             </Button>
-              {this.state.errorMessage && <><p>{this.state.errorMessage}</p></>}
+              {this.state.errorMessage &&
+                <Alert className='alert' color='danger'>{this.state.errorMessage}</Alert>
+              }
             </ModalFooter>
           </Modal>
           <Form onSubmit={this.handleLogin}>
@@ -176,7 +178,9 @@ export default class Login extends Component {
           >
             Sign up
             </Button>
-          <p>{this.state.errorMessage}</p>
+          {this.state.errorMessage &&
+            <Alert className='alert' color='danger'>{this.state.errorMessage}</Alert>
+          }
         </Container>
       </div >
     );
