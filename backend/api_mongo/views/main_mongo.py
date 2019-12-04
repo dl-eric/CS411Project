@@ -34,7 +34,7 @@ def create_messages():
             file_id=data["file_id"],
             user_id=data["user_id"],
             friend_id=data["friend_id"],
-            reactions=(message["reactions"] if "reactions" in message else None),
+            reactions=message["reactions"] if "reactions" in message else None,
             share=message["share"]["link"] if "share" in data else None,
         )
         messages.append(new_message)
