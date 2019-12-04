@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_file
 from api_mongo.models import db
 from api.models.base import db as sqldb
 from api_mongo.core import create_response, serialize_list, logger
@@ -10,6 +10,9 @@ import matplotlib.pyplot as plt
 import re
 from collections import Counter
 import numpy as np
+from requests_toolbelt import MultipartEncoder
+import os
+import zipfile
 import datetime
 
 main_mongo = Blueprint("main_mongo", __name__)  # initialize blueprint
@@ -36,7 +39,7 @@ def bar_plot_generator(title, bars, height):
     plt.bar(y_pos, height)
     plt.xticks(y_pos, bars)
     plt.title(title)
-    fig.savefig(title + " bar" + ".png")
+    fig.savefig(os.path.join("files", title + " bar" + ".png"))
     # plt.clt()
 
 
@@ -49,8 +52,7 @@ def word_cloud_generator(title, word_list):
         plt.imshow(wordcloud, interpolation="bilinear")
         plt.title(title)
         plt.axis("off")
-        fig.savefig(title + " wc" + ".png")
-        logger.info(fig)
+        fig.savefig(os.path.join("files", title + " wc" + ".png"))
     # plt.clt()
 
 
@@ -66,7 +68,6 @@ def sentiment_analysis_np(userId, friendId, sender, s):
     # Create bar plot
     height = [len(pos_list), len(neg_list)]
     bars = ("Positive", "Negative")
-    bar_plot_generator(str(userId) + str(friendId) + sender, bars, height)
 
     # Create word cloud
     word_cloud_generator(
@@ -237,7 +238,7 @@ def frequent_reacts(userId, friendId):
                 count.append(v)
 
     print(emojis, count)
-    bar_plot_generator("Frequent Reacts", emojis, count)
+    return bar_plot_generator("Frequent Reacts", emojis, count)
 
 
 # sentiment analysis
@@ -333,12 +334,16 @@ def create_messages():
     data = request.form
 
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    sqldb.session.execute("INSERT INTO File (timestamp) VALUES (:timestamp)", {'timestamp': timestamp})
+    sqldb.session.execute(
+        "INSERT INTO File (timestamp) VALUES (:timestamp)", {"timestamp": timestamp}
+    )
     sqldb.session.commit()
-    
-    c = sqldb.session.execute("SELECT id FROM File WHERE timestamp=:timestamp", {'timestamp': timestamp})
-    file_id = c.fetchone()['id']
-    
+
+    c = sqldb.session.execute(
+        "SELECT id FROM File WHERE timestamp=:timestamp", {"timestamp": timestamp}
+    )
+    file_id = c.fetchone()["id"]
+
     if data is None:
         return create_response(status=400, message="Form data not provided")
 
@@ -354,11 +359,11 @@ def create_messages():
     file_data = json.load(f)["messages"]
 
     for message in file_data:
-        key = 'content'
-        if ((key in message) and (message['type'] == 'Generic')):
+        key = "content"
+        if (key in message) and (message["type"] == "Generic"):
             content = message[key]
             message[key] = split_and_lower(content)
-            message['word_count'] = len(message[key])
+            message["word_count"] = len(message[key])
             message["fileId"] = file_id
             message["userId"] = data["userId"]
             message["friendId"] = data["friendId"]
@@ -366,6 +371,13 @@ def create_messages():
     db.message.insert_many(file_data)
 
     return create_response(message=f"Successfully created new message", data=timestamp)
+
+
+def zipdir(path, ziph):
+    # ziph is zipfile handle
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            ziph.write(os.path.join(root, file))
 
 
 @main_mongo.route("/sentiments", methods=["GET"])
@@ -382,7 +394,21 @@ def get_sentiments():
     message_counts(friendId, userId)
     word_counts(friendId, userId)
     frequent_reacts(friendId, userId)
+
     word_cloud(friendId, userId)
     sentiment_analysis(friendId, userId)
-    return create_response(message=f"Success")
+
+    # multi = MultipartEncoder(
+    #     {"reactFile": (freq_react_file, open(freq_react_file), "text/plain")}
+    # )
+
+    # Response(m.to_string(), mimetype=m.content_type)
+
+    # send_from
+
+    zipf = zipfile.ZipFile("files.zip", "w", zipfile.ZIP_DEFLATED)
+    zipdir("files/", zipf)
+    zipf.close()
+
+    return send_file("../files.zip")
 
