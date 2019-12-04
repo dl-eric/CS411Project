@@ -94,12 +94,10 @@ class FriendDetailPage extends Component {
     let counts = {};
     const { pos, neg } = response;
     Object.keys(response.counts).forEach(person => {
-      counts[person] = Object.keys(response.counts[person])
-        .map(word => ({
-          text: word,
-          value: response.counts[person][word]
-        }))
-        .sort((left, right) => right.value - left.value);
+      counts[person] = Object.keys(response.counts[person]).map(word => ({
+        text: word,
+        value: response.counts[person][word]
+      }));
     });
     console.log(counts);
     this.setState({
