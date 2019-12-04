@@ -378,4 +378,19 @@ def get_sentiments():
 
     counts = word_cloud(userId, friendId)
 
-    return create_response(data={"counts": counts, "neg": neg, "pos": pos})
+    countsOut = {}
+    for key in counts.keys():
+        countsOut[key] = {}
+        countsOut[key]["pos"] = [
+            {"text": key2, "value": counts[key][key2]}
+            for key2 in counts[key].keys()
+            if key2 in pos
+        ]
+        countsOut[key]["neg"] = [
+            {"text": key2, "value": counts[key][key2]}
+            for key2 in counts[key].keys()
+            if key2 in neg
+        ]
+
+    return create_response(data={"counts": countsOut})
+

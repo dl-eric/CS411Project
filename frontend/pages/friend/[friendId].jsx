@@ -11,7 +11,7 @@ import {
   sendFile
 } from "../../utils/ApiWrapper";
 import "../../public/style.scss";
-import Wordcloud from "react-wordcloud";
+import { Resizable } from "re-resizable";
 
 class FriendDetailPage extends Component {
   constructor(props) {
@@ -22,13 +22,21 @@ class FriendDetailPage extends Component {
       fileTimes: [],
       isEditingName: false,
       counts: null,
-      pos: null,
-      neg: null
+      person: null,
+      sentiment: null
     };
   }
 
   async componentDidMount() {
     await this.getDataWrapper();
+    const response = await getSentiment(
+      this.state.friend.userId,
+      this.state.friendId
+    );
+    const { counts } = response;
+    this.setState({
+      counts
+    });
   }
 
   getDataWrapper = async () => {
@@ -86,27 +94,14 @@ class FriendDetailPage extends Component {
     });
   };
 
-  getFriendSentiment = async () => {
-    const response = await getSentiment(
-      this.state.friend.userId,
-      this.state.friendId
-    );
-    let counts = {};
-    const { pos, neg } = response;
-    Object.keys(response.counts).forEach(person => {
-      counts[person] = Object.keys(response.counts[person]).map(word => ({
-        text: word,
-        value: response.counts[person][word]
-      }));
-    });
-    this.setState({
-      counts,
-      pos,
-      neg
-    });
-  };
-
   render() {
+    const resizeStyle = {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      border: "solid 1px #ddd",
+      background: "#f0f0f0"
+    };
     return (
       <div className="app">
         <Container fluid>
@@ -147,25 +142,42 @@ class FriendDetailPage extends Component {
               </section>
             )}
           </Dropzone>
-          <Button onClick={this.getFriendSentiment}>getFriendSentiment</Button>
+
           {this.state.counts &&
             Object.keys(this.state.counts).map(person => (
               <>
-                <h3>{person}</h3>
-                <h3>Positive</h3>
-                <ReactWordcloud
-                  words={this.state.counts[person].filter(word =>
-                    this.state.pos.includes(word.text)
-                  )}
-                />
-                <h3>Negative</h3>
-                <ReactWordcloud
-                  words={this.state.counts[person].filter(word =>
-                    this.state.neg.includes(word.text)
-                  )}
-                />
+                <Button
+                  onClick={() =>
+                    this.setState({ person, sentiment: "Positive" })
+                  }
+                >
+                  {person} - Positive
+                </Button>
+                <Button
+                  onClick={() =>
+                    this.setState({ person, sentiment: "Negative" })
+                  }
+                >
+                  {person} - Negative
+                </Button>
               </>
             ))}
+          {this.state.person && (
+            <>
+              <h3>
+                {this.state.person} - {this.state.sentiment}
+                <Resizable style={resizeStyle}>
+                  <ReactWordcloud
+                    words={
+                      this.state.counts[this.state.person][
+                        this.state.sentiment === "Positive" ? "pos" : "neg"
+                      ]
+                    }
+                  />
+                </Resizable>
+              </h3>
+            </>
+          )}
         </Container>
       </div>
     );
