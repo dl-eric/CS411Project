@@ -17,6 +17,12 @@ import datetime
 
 main_mongo = Blueprint("main_mongo", __name__)  # initialize blueprint
 
+with open('sentiment_dict.json') as template:
+        template_dct = json.load(template)
+
+neg_set = set(template_dct['negative'])
+pos_set = set(template_dct['positive'])
+
 emoji_dict = {
     "ð\x9f\x98\x8d": "\U0001F60D",
     "ð\x9f\x98\x86": "\U0001F606",
@@ -27,11 +33,6 @@ emoji_dict = {
     "ð\x9f\x91\x8d": "\U0001F44D",
     "ð\x9f\x91\x8e": "\U0001F44E",
 }
-
-
-def split_and_lower(s):
-    return list(filter(None, re.split("[^a-z']", s.lower())))
-
 
 def bar_plot_generator(title, bars, height):
     y_pos = np.arange(len(bars))
@@ -56,33 +57,18 @@ def word_cloud_generator(title, word_list):
     # plt.clt()
 
 
-def sentiment_analysis_np(userId, friendId, sender, s):
-    with open("sentiment_dict.json") as template:
-        template_dct = json.load(template)
-    neg = template_dct["negative"]
-    pos = template_dct["positive"]
+def sentiment_analysis_pos(s):
+    l = Counter(s)
+    pos_dict = {k: v for k, v in l.items() if (k in pos_set)}
+    return pos_dict
 
-    pos_list = list((Counter(s) & Counter(pos)).elements())
-    neg_list = list((Counter(s) & Counter(neg)).elements())
-
-    logger.info(Counter(pos_list))
-
-    # Create bar plot
-    height = [len(pos_list), len(neg_list)]
-    bars = ("Positive", "Negative")
-
-    # Create word cloud
-    word_cloud_generator(
-        str(userId) + str(friendId) + sender + " +", " ".join(pos_list)
-    )
-    word_cloud_generator(
-        str(userId) + str(friendId) + sender + " -", " ".join(neg_list)
-    )
-
+def sentiment_analysis_neg(s):
+    l = Counter(s)
+    neg_dict = {k: v for k, v in l.items() if (k in neg_set)}
+    return neg_dict
 
 def split_and_lower(s):
     return list(filter(None, re.split("[^a-z']", s.lower())))
-
 
 # insert messages into db
 def insert_file(userId, friendId, fileid, filename):
@@ -271,7 +257,7 @@ def sentiment_analysis(userId, friendId):
 def word_cloud(userId, friendId):
     messages = db.message.aggregate(
         [
-            {"$match": {"userId": userId, "friendId": friendId}},
+            {"$match": {"userId": userId, "friendId": "type", "Generic"}},
             {"$unwind": "$content"},
             {"$group": {"_id": "$sender_name", "content": {"$push": "$content"}}},
         ]
@@ -421,4 +407,3 @@ def get_sentiments():
     # send_from
 
     return create_response(data={"counts": counts, "neg": neg, "pos": pos})
-
