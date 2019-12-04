@@ -242,3 +242,15 @@ def get_sentiment(id):
     sentiment = dict(sentiment.items())
 
     return create_response(data=sentiment, status=200)
+
+
+@main.route("/file/<id>", methods=["GET"])
+def get_file_timestamp(id):
+    result = db.session.execute("SELECT timestamp FROM File WHERE id=:id", {"id": id})
+
+    answer = result.fetchone()
+
+    if not answer:
+        return create_response(status=404, message="File not found")
+    return create_response(data={"timestamp": answer.timestamp})
+

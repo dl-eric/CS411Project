@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Head } from "../../components";
 import {
-  CardHeader,
   Container,
   Button,
   Row,
@@ -14,7 +13,7 @@ import {
   Input,
   FormGroup,
   Label,
-  CardFooter
+  CardBody
 } from "reactstrap";
 import {
   getFriends,
@@ -135,37 +134,41 @@ class FriendPage extends Component {
             {this.state.friends.map(friend => (
               <Col md="3" key={friend.friendId}>
                 <Card className="friend-card">
-                  <CardHeader>
+                  <CardBody>
                     <h3 align="center">{friend.name}</h3>
-                  </CardHeader>
-                  <CardFooter>
-                    <Button
-                      className="detail-btn"
-                      onClick={() => Router.push(`/friend/${friend.friendId}`)}
-                    >
-                      Details
-                    </Button>
-                    <Button
-                      className="detail-btn"
-                      onClick={() => {
-                        this.removeFriend(friend.friendId);
-                      }}
-                    >
-                      Delete
-                    </Button>
-                    {this.state.counts && (
-                      <p>
-                        Total messages:{" "}
-                        {this.state.counts.some(
-                          count => count.friendId === friend.friendId
-                        )
-                          ? this.state.counts.find(
-                              count => count.friendId === friend.friendId
-                            ).sumMessages || 0
-                          : 0}
-                      </p>
-                    )}
-                  </CardFooter>
+                    <div className="card-btns">
+                      <Button
+                        className="detail-btn"
+                        color="secondary"
+                        onClick={() =>
+                          Router.push(`/friend/${friend.friendId}`)
+                        }
+                      >
+                        Details
+                      </Button>
+                      <Button
+                        className="detail-btn"
+                        color="danger"
+                        onClick={() => {
+                          this.removeFriend(friend.friendId);
+                        }}
+                      >
+                        Delete
+                      </Button>
+                      {this.state.counts && (
+                        <p>
+                          Total messages:{" "}
+                          {this.state.counts.some(
+                            count => count.friendId === friend.friendId
+                          )
+                            ? this.state.counts.find(
+                                count => count.friendId === friend.friendId
+                              ).sumMessages || 0
+                            : 0}
+                        </p>
+                      )}
+                    </div>
+                  </CardBody>
                 </Card>
               </Col>
             ))}
