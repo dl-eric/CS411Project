@@ -25,6 +25,11 @@ body {
   margin-bottom: 20px;
 }
 
+.back-btn {
+  margin-bottom: 20px;
+  margin-right: 10px;
+}
+
 .logout-btn {
   float: right;
   margin-bottom: 20px;
@@ -57,7 +62,7 @@ h1 {
 }
 
 .msg-count {
-  padding-top: 20px;
+  padding: 15px;
 }
 
 .sentiment-btn {
@@ -71,4 +76,12 @@ h1 {
 
 .edit-name-container {
   margin-bottom: 20px;
+}
+
+.alert {
+  margin-top: 20px;
+}
+
+.sentiment-name {
+  margin-top: 20px;
 }

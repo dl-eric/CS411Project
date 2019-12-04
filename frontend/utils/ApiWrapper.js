@@ -1,8 +1,8 @@
 import axios from "axios";
 import FormData from "form-data";
 
-// const BACKEND_URL = "https://cs411finalproject.herokuapp.com";
-const BACKEND_URL = "http://52.240.158.249:5000";
+const BACKEND_URL = "https://cs411finalproject.herokuapp.com";
+// const BACKEND_URL = "http://52.240.158.249:5000";
 
 export const helloWorld = () =>
   axios

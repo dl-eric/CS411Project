@@ -140,6 +140,18 @@ class FriendPage extends Component {
                 <Card className="friend-card">
                   <CardBody>
                     <h3 align="center">{friend.name}</h3>
+                    {this.state.counts && (
+                        <h5 className="msg-count">
+                          Total messages:{" "}
+                          {this.state.counts.some(
+                            count => count.friendId === friend.friendId
+                          )
+                            ? this.state.counts.find(
+                                count => count.friendId === friend.friendId
+                              ).sumMessages || 0
+                            : 0}
+                        </h5>
+                      )}
                     <div className="card-btns">
                       <Button
                         className="detail-btn"
@@ -159,18 +171,7 @@ class FriendPage extends Component {
                       >
                         Delete
                       </Button>
-                      {this.state.counts && (
-                        <h5 className="msg-count">
-                          Total messages:{" "}
-                          {this.state.counts.some(
-                            count => count.friendId === friend.friendId
-                          )
-                            ? this.state.counts.find(
-                                count => count.friendId === friend.friendId
-                              ).sumMessages || 0
-                            : 0}
-                        </h5>
-                      )}
+                      
                     </div>
                   </CardBody>
                 </Card>

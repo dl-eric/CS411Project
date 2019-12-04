@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Head } from "../components";
-import { Button, Form, FormGroup, Input, Container } from "reactstrap";
+import { Button, Form, FormGroup, Input, Container, Alert } from "reactstrap";
 
 import Router from "next/router";
 
@@ -113,7 +113,9 @@ export default class Login extends Component {
             >
               Sign up
             </Button>
-            <p>{this.state.errorMessage}</p>
+            {this.state.errorMessage && 
+            <Alert className='alert' color='danger'>{this.state.errorMessage}</Alert>
+            }
           </Form>
         </Container>
       </div>

@@ -108,13 +108,23 @@ class FriendDetailPage extends Component {
       alignItems: "center",
       justifyContent: "center",
       border: "solid 1px #ddd",
-      background: "#f0f0f0"
+      background: "#f0f0f0",
+      margin: "20px 0px 0px 0px"
     };
     return (
       <div className="app">
         <Container fluid>
           <Head title={this.state.friend.name} />
           <h1 align="center">{this.state.friend.name}</h1>
+          <Button
+            className='back-btn'
+            color="danger"
+            onClick={() =>
+              Router.push(`/dashboard/${this.state.friend.userId}`)
+            }
+          >
+            Back
+          </Button>
           <Button
             className="action-btn"
             color="primary"
@@ -134,15 +144,6 @@ class FriendDetailPage extends Component {
               <Button color='danger' className='edit-name-btn' onClick={this.cancelEditName}>Cancel</Button>
             </div>
           )}
-          <Button
-            className="logout-btn"
-            color="danger"
-            onClick={() =>
-              Router.push(`/dashboard/${this.state.friend.userId}`)
-            }
-          >
-            Back
-          </Button>
           <h4>Uploaded Files:</h4>
           <ul>
             {this.state.fileTimes.map(fileTime => (
@@ -184,7 +185,7 @@ class FriendDetailPage extends Component {
             ))}
           {this.state.person && (
             <>
-              <h3>
+              <h4 className='sentiment-name'>
                 {this.state.person} - {this.state.sentiment}
                 <Resizable style={resizeStyle}>
                   <ReactWordcloud
@@ -195,7 +196,7 @@ class FriendDetailPage extends Component {
                     }
                   />
                 </Resizable>
-              </h3>
+              </h4>
             </>
           )}
         </Container>
