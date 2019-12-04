@@ -99,7 +99,6 @@ class FriendDetailPage extends Component {
         value: response.counts[person][word]
       }));
     });
-    console.log(counts);
     this.setState({
       counts,
       pos,
