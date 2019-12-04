@@ -17,6 +17,14 @@ import datetime
 
 main_mongo = Blueprint("main_mongo", __name__)  # initialize blueprint
 
+with open("sentiment_dict.json") as template:
+    template_dct = json.load(template)
+
+neg = template_dct['negative']
+pos = template_dct['positive']
+neg_set = set(neg)
+pos_set = set(pos)
+
 emoji_dict = {
     "ð\x9f\x98\x8d": "\U0001F60D",
     "ð\x9f\x98\x86": "\U0001F606",
@@ -28,58 +36,20 @@ emoji_dict = {
     "ð\x9f\x91\x8e": "\U0001F44E",
 }
 
-
-def split_and_lower(s):
-    return list(filter(None, re.split("[^a-z']", s.lower())))
-
-
-def bar_plot_generator(title, bars, height):
-    y_pos = np.arange(len(bars))
-    fig = plt.figure()
-    plt.bar(y_pos, height)
-    plt.xticks(y_pos, bars)
-    plt.title(title)
-    fig.savefig(os.path.join("files", title + " bar" + ".png"))
-    # plt.clt()
+def sentiment_analysis_pos(s):
+    l = Counter(s)
+    pos_dict = {k: v for k, v in l.items() if (k in pos_set)}
+    return pos_dict
 
 
-def word_cloud_generator(title, word_list):
-    if len(word_list) > 0:
-        wordcloud = WordCloud(background_color="black", colormap="rainbow").generate(
-            word_list
-        )
-        fig = plt.figure()
-        plt.imshow(wordcloud, interpolation="bilinear")
-        plt.title(title)
-        plt.axis("off")
-        fig.savefig(os.path.join("files", title + " wc" + ".png"))
-    # plt.clt()
-
-
-def sentiment_analysis_np(userId, friendId, sender, s):
-    with open("sentiment_dict.json") as template:
-        template_dct = json.load(template)
-    neg = template_dct["negative"]
-    pos = template_dct["positive"]
-
-    pos_list = list((Counter(s) & Counter(pos)).elements())
-    neg_list = list((Counter(s) & Counter(neg)).elements())
-
-    # Create bar plot
-    height = [len(pos_list), len(neg_list)]
-    bars = ("Positive", "Negative")
-
-    # Create word cloud
-    word_cloud_generator(
-        str(userId) + str(friendId) + sender + " +", " ".join(pos_list)
-    )
-    word_cloud_generator(
-        str(userId) + str(friendId) + sender + " -", " ".join(neg_list)
-    )
+def sentiment_analysis_neg(s):
+    l = Counter(s)
+    neg_dict = {k: v for k, v in l.items() if (k in neg_set)}
+    return neg_dict
 
 
 def split_and_lower(s):
-    return list(filter(None, re.split("[^a-z']", s.lower())))
+    return list(filter(lambda x: len(x) > 1, re.split("[^a-z']", s.lower())))
 
 
 # insert messages into db
@@ -238,7 +208,7 @@ def frequent_reacts(userId, friendId):
                 count.append(v)
 
     print(emojis, count)
-    return bar_plot_generator("Frequent Reacts", emojis, count)
+    return {'emoji': emojis, 'count': count}
 
 
 # sentiment analysis
@@ -259,31 +229,34 @@ def sentiment_analysis(userId, friendId):
         ]
     )
 
-    for message in messages:
-        sentiment_analysis_np(userId, friendId, message["_id"], message["content"])
+    ret = {}
 
+    for message in messages:
+        ret[m_arr["_id"]] = {'pos': sentiment_analysis_pos(message["content"]), 'neg': sentiment_analysis_neg(message["content"])}
+
+    return ret
 
 # word cloud
 def word_cloud(userId, friendId):
     messages = db.message.aggregate(
         [
-            {
-                "$match": {
-                    "$and": [
-                        {"userId": userId},
-                        {"friendId": friendId},
-                        {"word_count": {"$gt": 0}},
-                    ]
-                }
-            },
+            {"$match": {"userId": userId, "friendId": friendId, "type": "Generic"}},
             {"$unwind": "$content"},
             {"$group": {"_id": "$sender_name", "content": {"$push": "$content"}}},
         ]
     )
+    logger.info("user %s", userId)
+    logger.info("friend %s", friendId)
+
+    ret = {}
 
     for m_arr in messages:
-        message = " ".join(m_arr["content"])
-        word_cloud_generator(str(userId) + str(friendId) + m_arr["_id"], message)
+        ret[m_arr["_id"]] = Counter(m_arr["content"])
+        # message = " ".join(m_arr["content"])
+        # word_cloud_generator(
+        #     str(userId) + "_" + str(friendId) + "_" + m_arr["_id"], message
+        # )
+    return ret
 
 
 def find_messages_between(userId, friendId):
@@ -352,7 +325,7 @@ def create_messages():
     if data is None:
         return create_response(status=400, message="Form data not provided")
 
-    for field in ["fileId", "userId", "friendId"]:
+    for field in ["userId", "friendId"]:
         if field not in data:
             return create_response(status=400, message=field + " not provided")
 
@@ -375,7 +348,9 @@ def create_messages():
 
     db.message.insert_many(file_data)
 
-    return create_response(message=f"Successfully created new message", data={'timestamp':timestamp})
+    return create_response(
+        message=f"Successfully created new message", data={"timestamp": timestamp}
+    )
 
 
 def zipdir(path, ziph):
@@ -396,12 +371,15 @@ def get_sentiments():
     if not friendId:
         return create_response(status=400, message="Must specify friendId")
 
-    message_counts(friendId, userId)
-    word_counts(friendId, userId)
-    frequent_reacts(friendId, userId)
+    userId = str(userId)
+    friendId = str(friendId)
 
-    word_cloud(friendId, userId)
-    sentiment_analysis(friendId, userId)
+    message_counts(userId, friendId)
+    word_counts(userId, friendId)
+    frequent_reacts(userId, friendId)
+
+    counts = word_cloud(userId, friendId)
+    sentiment_analysis(userId, friendId)
 
     # multi = MultipartEncoder(
     #     {"reactFile": (freq_react_file, open(freq_react_file), "text/plain")}
@@ -411,9 +389,4 @@ def get_sentiments():
 
     # send_from
 
-    zipf = zipfile.ZipFile("files.zip", "w", zipfile.ZIP_DEFLATED)
-    zipdir("files/", zipf)
-    zipf.close()
-
-    return send_file("../files.zip")
-
+    return create_response(data={"counts": counts, "neg": neg, "pos": pos})

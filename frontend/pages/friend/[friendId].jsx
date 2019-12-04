@@ -3,13 +3,15 @@ import { Head } from "../../components";
 import { Button, Container, Input } from "reactstrap";
 import Dropzone from "react-dropzone";
 import { withRouter } from "next/router";
+import ReactWordcloud from "react-wordcloud";
 import {
   getFriend,
   changeFriendName,
   getSentiment,
-  updateSentiment
+  sendFile
 } from "../../utils/ApiWrapper";
 import "../../public/style.scss";
+import Wordcloud from "react-wordcloud";
 
 class FriendDetailPage extends Component {
   constructor(props) {
@@ -17,9 +19,11 @@ class FriendDetailPage extends Component {
     this.state = {
       friend: {},
       friendId: "",
-      sentiment: {},
+      fileTimes: [],
       isEditingName: false,
-      newFile: ""
+      counts: null,
+      pos: null,
+      neg: null
     };
   }
 
@@ -33,18 +37,25 @@ class FriendDetailPage extends Component {
       friendId
     });
     const friend = await getFriend(friendId);
-    const sentiment = await getSentiment(friendId);
     this.setState({
-      friend,
-      sentiment
+      friend
     });
   };
 
   onDrop = async files => {
-    const newSentiment = {
-      filename: files[0].name
-    };
-    await updateSentiment(this.state.friendId, newSentiment);
+    let timestamps = [];
+    for (let file of files) {
+      const res = await sendFile(
+        file,
+        this.state.friend.userId,
+        this.state.friendId
+      );
+      const timestamp = res.response.data.result.timestamp;
+      timestamps.push(timestamp);
+    }
+    this.setState({
+      fileTimes: timestamps
+    });
     await this.getDataWrapper();
   };
 
@@ -75,6 +86,29 @@ class FriendDetailPage extends Component {
     });
   };
 
+  getFriendSentiment = async () => {
+    const response = await getSentiment(
+      this.state.friend.userId,
+      this.state.friendId
+    );
+    let counts = {};
+    const { pos, neg } = response;
+    Object.keys(response.counts).forEach(person => {
+      counts[person] = Object.keys(response.counts[person])
+        .map(word => ({
+          text: word,
+          value: response.counts[person][word]
+        }))
+        .sort((left, right) => right.value - left.value);
+    });
+    console.log(counts);
+    this.setState({
+      counts,
+      pos,
+      neg
+    });
+  };
+
   render() {
     return (
       <div className="app">
@@ -99,7 +133,12 @@ class FriendDetailPage extends Component {
               <Button onClick={this.cancelEditName}>Cancel</Button>
             </>
           )}
-          <h4>File: {this.state.sentiment.fileName}</h4>
+          <h4>Uploaded Files:</h4>
+          <ul>
+            {this.state.fileTimes.map(fileTime => (
+              <li>{fileTime}</li>
+            ))}
+          </ul>
           <h4>Upload File</h4>
           <Dropzone onDrop={this.onDrop}>
             {({ getRootProps, getInputProps }) => (
@@ -111,6 +150,25 @@ class FriendDetailPage extends Component {
               </section>
             )}
           </Dropzone>
+          <Button onClick={this.getFriendSentiment}>getFriendSentiment</Button>
+          {this.state.counts &&
+            Object.keys(this.state.counts).map(person => (
+              <>
+                <h3>{person}</h3>
+                <h3>Positive</h3>
+                <ReactWordcloud
+                  words={this.state.counts[person].filter(word =>
+                    this.state.pos.includes(word.text)
+                  )}
+                />
+                <h3>Negative</h3>
+                <ReactWordcloud
+                  words={this.state.counts[person].filter(word =>
+                    this.state.neg.includes(word.text)
+                  )}
+                />
+              </>
+            ))}
         </Container>
       </div>
     );

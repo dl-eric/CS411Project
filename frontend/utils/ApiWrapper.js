@@ -98,9 +98,9 @@ export const deleteFriend = friendId =>
       return error.response;
     });
 
-export const getSentiment = friendId =>
+export const getSentiment = (userId, friendId) =>
   axios
-    .get(`${BACKEND_URL}/sentiments/${friendId}`)
+    .get(`${BACKEND_URL}/sentiments?userId=${userId}&friendId=${friendId}`)
     .then(response => {
       console.log(response);
       return response.data.result;
@@ -133,3 +133,38 @@ export const updateSentiment = (friendId, sentiment) =>
       console.log(error);
       return error.response;
     });
+
+export const createFile = file => {
+  axios
+    .post(`${BACKEND_URL}/sentiments/${friendId}`, file)
+    .then(response => {
+      console.log(response);
+      return response;
+    })
+    .catch(error => {
+      console.log(error);
+      return error.response;
+    });
+};
+
+export const sendFile = (file, userId, friendId) => {
+  let data = new FormData();
+  data.append("file", file);
+  data.append("userId", userId);
+  data.append("friendId", friendId);
+
+  return axios
+    .post(BACKEND_URL + "/messages", data)
+    .then(response => {
+      return {
+        type: "UPLOAD_FILE_SUCCESS",
+        response
+      };
+    })
+    .catch(error => {
+      return {
+        type: "UPLOAD_FILE_FAIL",
+        error
+      };
+    });
+};
