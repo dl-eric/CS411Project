@@ -311,7 +311,7 @@ def get_messages():
 def get_files(user_id, friend_id):
     alice = set()
     timestamps = sqldb.session.execute(
-        "SELECT timestamp FROM Friend Fr JOIN File Fi ON Fr.friendId=Fi.id WHERE Fr.friendId=:id",
+        "SELECT timestamp FROM Friend Fr JOIN File Fi ON Fr.friendId=Fi.friendId WHERE Fr.friendId=:id",
         {"id": friend_id},
     )
 
@@ -364,9 +364,11 @@ def create_messages():
     db.message.insert_many(file_data)
 
     sqldb.session.execute(
-        "UPDATE File SET totalMessages=(:totalMessages) WHERE userId=(:id)",
+        "UPDATE File SET totalMessages=(:totalMessages) WHERE id=(:id)",
         {"totalMessages": len(file_data), "id": file_id},
     )
+
+    sqldb.session.commit()
 
     return create_response(
         message=f"Successfully created new message", data={"timestamp": timestamp}

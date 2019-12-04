@@ -199,7 +199,9 @@ def get_message_count(id):
         {"id": id},
     )
 
-    return create_response(data={"result": [dict(row) for row in result]})
+   ret = [dict(row) for row in result]
+
+    return create_response(data={"result": ret})
 
 
 @main.route("/sentiments/<id>", methods=["PUT", "GET"])
