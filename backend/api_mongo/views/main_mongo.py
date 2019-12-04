@@ -24,25 +24,21 @@ def create_messages():
     f = request.files.get("file")
 
     file_data = json.load(f)
-
+    messages = []
     for message in file_data["messages"]:
-        if "content" not in message:
-            continue
         new_message = Message(
             sender=message["sender_name"],
             timestamp=message["timestamp_ms"],
-            content=message["content"],
+            content=message["content"] if "content" in message else None,
             message_type=message["type"],
             file_id=data["file_id"],
             user_id=data["user_id"],
             friend_id=data["friend_id"],
-            reactions=(
-                [reaction["reaction"] for reaction in message["reactions"]]
-                if "reactions" in message
-                else None
-            ),
+            reactions=(message["reactions"] if "reactions" in message else None),
+            share=message["share"]["link"] if "share" in data else None,
         )
-        new_message.save()
+        messages.append(new_message)
+    Message.objects.insert(messages)
 
     return create_response(message=f"Successfully created new message")
 
