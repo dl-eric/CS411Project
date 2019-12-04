@@ -258,7 +258,7 @@ def sentiment_analysis(userId, friendId):
 def word_cloud(userId, friendId):
     messages = db.message.aggregate(
         [
-            {"$match": {"userId": userId, "friendId": "type", "Generic"}},
+            {"$match": {"userId": userId, "friendId": friendId, "type", "Generic"}},
             {"$unwind": "$content"},
             {"$group": {"_id": "$sender_name", "content": {"$push": "$content"}}},
         ]
