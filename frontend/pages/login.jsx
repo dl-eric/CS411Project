@@ -99,8 +99,8 @@ export default class Login extends Component {
                 onChange={this.updatePassword}
               />
             </FormGroup>
-            <Button color='success' className='detail-btn' onClick={this.handleLogin}>Log in</Button>
-            <Button color='primary' onClick={this.handlesignUp}>Sign up</Button>
+            <Button color='success' className='login-btn' onClick={this.handleLogin}>Log in</Button>
+            <Button color='primary' className='login-btn' onClick={this.handlesignUp}>Sign up</Button>
             <p>{this.state.errorMessage}</p>
           </Form>
         </Container>
