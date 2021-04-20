@@ -37,7 +37,7 @@ pg8000==1.13.2
 Pillow==6.2.1
 pluggy==0.13.1
 psycopg2==2.7.5
-py==1.8.0
+py==1.10.0
 pylint==2.4.4
 pymongo==3.9.0
 pyparsing==2.4.5
