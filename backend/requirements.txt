@@ -34,7 +34,7 @@ numpy==1.17.4
 packaging==19.2
 pathspec==0.6.0
 pg8000==1.13.2
-Pillow==6.2.1
+Pillow==9.0.1
 pluggy==0.13.1
 psycopg2==2.7.5
 py==1.8.0
